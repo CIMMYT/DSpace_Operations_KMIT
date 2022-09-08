@@ -39,10 +39,14 @@ public class BitstreamResourcePolicyUtils {
      * @param context               The relevant DSpace Context.
      * @param uploadConfig          The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
-     * @param newAccessCondition    The access condition containing the details for the desired policies
+     * @param newAccessConditions   The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+<<<<<<< HEAD
      * @throws ParseException       If parse error
+=======
+     * @throws ParseException       Passed through.
+>>>>>>> b0316b4f74 (Clean up all recommendations, plus scads of missing Javascript semicolons.)
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
@@ -61,8 +65,7 @@ public class BitstreamResourcePolicyUtils {
 
     /**
      * Based on the given name, find the resource policy to apply on the given DSpace object
-     * This function applies the resource policies.
-     * The description, start date and end date are applied as well
+     * This function applies the resource policies.The description, start date and end date are applied as well
      *
      * @param context               The relevant DSpace Context.
      * @param uploadConfiguration   The configured UploadConfiguration
@@ -73,7 +76,11 @@ public class BitstreamResourcePolicyUtils {
      * @param endDate               An optional end date for the policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+<<<<<<< HEAD
      * @throws ParseException       If parse error
+=======
+     * @throws ParseException       Passed through.
+>>>>>>> b0316b4f74 (Clean up all recommendations, plus scads of missing Javascript semicolons.)
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, String name, String description,
