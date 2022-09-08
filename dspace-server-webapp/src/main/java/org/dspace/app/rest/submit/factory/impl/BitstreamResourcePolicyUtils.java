@@ -42,7 +42,11 @@ public class BitstreamResourcePolicyUtils {
      * @param newAccessConditions   The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+<<<<<<< HEAD
      * @throws ParseException       If parse error
+=======
+     * @throws ParseException       Passed through.
+>>>>>>> b0316b4f74 (Clean up all recommendations, plus scads of missing Javascript semicolons.)
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
@@ -72,7 +76,11 @@ public class BitstreamResourcePolicyUtils {
      * @param endDate               An optional end date for the policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+<<<<<<< HEAD
      * @throws ParseException       If parse error
+=======
+     * @throws ParseException       Passed through.
+>>>>>>> b0316b4f74 (Clean up all recommendations, plus scads of missing Javascript semicolons.)
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, String name, String description,
