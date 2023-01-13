@@ -97,6 +97,7 @@ public class OAIHarvester {
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
     private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+    private static final Namespace MARC_NS = Namespace.getNamespace("http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim");
 
     public static final String OAI_ADDRESS_ERROR = "invalidAddress";
     public static final String OAI_SET_ERROR = "noSuchSet";
