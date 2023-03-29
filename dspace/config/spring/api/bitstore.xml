@@ -23,7 +23,9 @@
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>
         <property name="awsSecretKey" value="${assetstore.s3.awsSecretKey}"/>
         <property name="useRelativePath" value="${assetstore.s3.useRelativePath}"/>
-
+        <!-- If you use other S3 provider that Amazon you can set the endpoint below -->
+        <!-- Note: The awsRegionName was ignore if awsEndPoint has a value -->
+        <property name="awsEndPoint" value="gateway.us1.storjshare.io"/>
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
         <property name="bucketName" value="${assetstore.s3.bucketName}"/>
 
@@ -34,6 +36,12 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
+
+        <!-- Enable if you must use multipart upload default false-->
+        <property name="enableMultipart" value="false"/>
+        <!-- Optional, enable if you must use multipart upload -->
+        <property name="ingestLimit" value="50"/>
+        <property name="minPartSize" value="10"/>
     </bean>
 
     <!-- <bean name="localStore2 ... -->

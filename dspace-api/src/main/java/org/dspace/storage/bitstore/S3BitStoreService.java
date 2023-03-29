@@ -23,6 +23,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -90,6 +91,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private String awsEndPoint;
     private boolean useRelativePath;
 
     /**
@@ -106,6 +108,11 @@ public class S3BitStoreService extends BaseBitStoreService {
      * S3 service
      */
     private AmazonS3 s3Service = null;
+
+    /** S3 multipart options **/
+    private Boolean enableMultipart;
+    private Long ingestLimit;
+    private Long minPartSize;
 
     /**
      * S3 transfer manager
@@ -132,6 +139,16 @@ public class S3BitStoreService extends BaseBitStoreService {
                 .withRegion(regions)
                 .build();
     }
+
+    protected static Supplier<AmazonS3> amazonClientBuilderEndPoint(
+        @NotNull AWSCredentials awsCredentials,
+        @NotNull EndpointConfiguration awsEndPoint
+        ){
+            return () -> AmazonS3ClientBuilder.standard()
+                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withEndpointConfiguration(awsEndPoint)
+                    .build();
+        }
 
     public S3BitStoreService() {}
 
@@ -170,22 +187,34 @@ public class S3BitStoreService extends BaseBitStoreService {
                 log.warn("Use local defined S3 credentials");
                 // region
                 Regions regions = Regions.DEFAULT_REGION;
-                if (StringUtils.isNotBlank(awsRegionName)) {
-                    try {
-                        regions = Regions.fromName(awsRegionName);
-                    } catch (IllegalArgumentException e) {
-                        log.warn("Invalid aws_region: " + awsRegionName);
-                    }
+                if (StringUtils.isNotBlank(awsEndPoint)) {
+                    s3Service = FunctionalUtils.getDefaultOrBuild(
+                        this.s3Service, 
+                        amazonClientBuilderEndPoint(
+                                    new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey()),
+                                    new EndpointConfiguration(getAwsEndPoint(), null)
+                                    )
+                    );
                 }
-                // init client
-                s3Service = FunctionalUtils.getDefaultOrBuild(
-                        this.s3Service,
-                        amazonClientBuilderBy(
-                                regions,
-                                new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
-                                )
-                        );
-                log.warn("S3 Region set to: " + regions.getName());
+                else{
+                    if (StringUtils.isNotBlank(awsRegionName)) {
+                        try {
+                            regions = Regions.fromName(awsRegionName);
+                        } catch (IllegalArgumentException e) {
+                            log.warn("Invalid aws_region: " + awsRegionName);
+                        }
+                    }
+                    // init client
+                    s3Service = FunctionalUtils.getDefaultOrBuild(
+                            this.s3Service,
+                            amazonClientBuilderBy(
+                                    regions,
+                                    new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
+                                    )
+                            );
+                    log.warn("S3 Region set to: " + regions.getName());
+                }
+
             } else {
                 log.info("Using a IAM role or aws environment credentials");
                 s3Service = FunctionalUtils.getDefaultOrBuild(
@@ -218,11 +247,6 @@ public class S3BitStoreService extends BaseBitStoreService {
         }
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
-
-        tm = FunctionalUtils.getDefaultOrBuild(tm, () -> TransferManagerBuilder.standard()
-                                                               .withAlwaysCalculateMultipartMd5(true)
-                                                               .withS3Client(s3Service)
-                                                               .build());
     }
 
     /**
@@ -271,14 +295,45 @@ public class S3BitStoreService extends BaseBitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
+
+        // Multipart S3 size
+        Long partSizeBytes = minPartSize * 1024 * 1024;
+        Long ingestLimitbytes = ingestLimit * 1024 * 1024;
+
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
             long contentLength = scratchFile.length();
+
+            log.info("-----------------------------------------");
+            log.info("El tamano de este fichero es: " + FileUtils.byteCountToDisplaySize(contentLength));
+            log.info("minPartSize: " + FileUtils.byteCountToDisplaySize(minPartSize));
+            log.info("partSizeBytes: " + FileUtils.byteCountToDisplaySize(partSizeBytes));
+            log.info("enableMultipart: " + Boolean.toString(enableMultipart));
+            log.info("ingestLimitbytes: " + FileUtils.byteCountToDisplaySize(ingestLimitbytes));
+            log.info("-----------------------------------------");
+
             // The ETag may or may not be and MD5 digest of the object data.
             // Therefore, we precalculate before uploading
+            if (enableMultipart && ingestLimitbytes < contentLength) {
+                log.info("Se configura el multipart para este fichero: ");
+                tm = FunctionalUtils.getDefaultOrBuild(tm, () -> TransferManagerBuilder.standard()
+                .withAlwaysCalculateMultipartMd5(true)
+                .withS3Client(s3Service)
+                .withMultipartUploadThreshold((long) partSizeBytes)
+                .build());
+            }
+            else{
+                tm = FunctionalUtils.getDefaultOrBuild(tm, () -> TransferManagerBuilder.standard()
+                    .withAlwaysCalculateMultipartMd5(true)
+                    .withS3Client(s3Service)
+                    .build());
+            }
+            
             String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
 
             Upload upload = tm.upload(bucketName, key, scratchFile);
+
+            
 
             upload.waitForUploadResult();
 
@@ -480,6 +535,39 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.useRelativePath = useRelativePath;
     }
 
+    public String getAwsEndPoint() {
+        return awsEndPoint;
+    }
+
+    public void setAwsEndPoint(String awsEndPoint) {
+        this.awsEndPoint = awsEndPoint;
+    } 
+
+    @Autowired(required = true)
+    public Boolean getEnableMultipart(){
+        return enableMultipart;
+    }
+
+    public void setEnableMultipart(Boolean enableMultipart){
+        this.enableMultipart = enableMultipart;
+    }
+
+    public Long getIngestLimit() {
+        return ingestLimit;
+    }
+
+    public void setIngestLimit(Long ingestLimit) {
+        this.ingestLimit = ingestLimit;
+    }
+
+    public Long getMinPartSize() {
+        return minPartSize;
+    }
+
+    public void setMinPartSize(Long minPartSize) {
+        this.minPartSize = minPartSize;
+    }
+
     /**
      * Contains a command-line testing tool. Expects arguments:
      * -a accessKey -s secretKey -f assetFileName
@@ -503,6 +591,9 @@ public class S3BitStoreService extends BaseBitStoreService {
         option = Option.builder("f").desc("asset file name").hasArg().required().build();
         options.addOption(option);
 
+        option = Option.builder("e").desc("custom end point").hasArg().build();
+        options.addOption(option);
+
         DefaultParser parser = new DefaultParser();
 
         CommandLine command;
@@ -518,6 +609,7 @@ public class S3BitStoreService extends BaseBitStoreService {
         String accessKey = command.getOptionValue("a");
         String secretKey = command.getOptionValue("s");
         String assetFile = command.getOptionValue("f");
+        String endPoint = command.getOptionValue("e");
 
         S3BitStoreService store = new S3BitStoreService();
 
@@ -526,8 +618,14 @@ public class S3BitStoreService extends BaseBitStoreService {
         store.s3Service = new AmazonS3Client(awsCredentials);
 
         //Todo configurable region
-        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
-        store.s3Service.setRegion(usEast1);
+        if (endPoint != null) {
+            store.s3Service.setEndpoint(endPoint);
+        }
+        else{
+            Region usEast1 = Region.getRegion(Regions.US_EAST_1);
+            store.s3Service.setRegion(usEast1);
+        }
+        
 
         // get hostname of DSpace UI to use to name bucket
         String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
