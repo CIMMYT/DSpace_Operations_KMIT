@@ -1,0 +1,16 @@
+## Workflow task email message
+##
+## {0}  Title of submission
+## {1}  link to 'Private Items' page
+##
+#set($subject = 'DSpace DEV: New item harvested')
+
+A new item has been harvested from koha:
+
+Title: ${params[0]}
+
+To review and make public this item, please visit your "Private Items" page:  ${params[1]}
+
+Many thanks!
+
+CIMMYT Institutional Multimedia Publications Repository
