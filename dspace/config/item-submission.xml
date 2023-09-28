@@ -18,7 +18,13 @@
     <!-- for handle "default". -->
     <submission-map>
         <!-- Default submission process -->
-        <name-map collection-handle="default" submission-name="traditional"/>
+        <!-- <name-map collection-handle="default" submission-name="traditional"/> -->
+        <name-map collection-handle="default" submission-name="standarCIMMYT"/>
+        <name-map collection-handle="10883/4049" submission-name="video_actualizada"/>
+        <name-map collection-handle="10883/4048" submission-name="photo"/>
+        <name-map collection-handle="10883/19654" submission-name="sas_latam"/>
+
+        <name-map collection-handle="10883/22490" submission-name="Person"/>
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -47,26 +53,6 @@
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
         -->
-        <!-- These configurations enable default submission forms per Entity type 
-            
-            The  collection-entity-type will be the entity-type attribute associated with a collection,
-            typically the entity name that is associated with a collection if any created or loaded 
-            (that is usually specified in relationship-types.xml).
-            - - - - - -
-            PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
-            - - - - - -
-            Uncomment if you intend to use them
-        -->  
-        <!-- 
-        <name-map collection-entity-type="Publication" submission-name="Publication"/>
-        <name-map collection-entity-type="Person" submission-name="Person"/>
-        <name-map collection-entity-type="Project" submission-name="Project"/>
-        <name-map collection-entity-type="OrgUnit" submission-name="OrgUnit"/>
-        <name-map collection-entity-type="Journal" submission-name="Journal"/>
-        <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
-        <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
-         -->
-
     </submission-map>
 
 
@@ -99,6 +85,7 @@
             <heading></heading>
             <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
             <type>collection</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
         <!-- The following set of DescribeStep <step-definition>s all point to forms (of the same name) which are
@@ -216,6 +203,55 @@
             <type>submission-form</type>
         </step-definition>
 
+        <!-- CIMMYT -->
+
+        <step-definition id="sas_latam_p1" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="video_updated_p1" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+
+        <step-definition id="video_updated_p2" mandatory="true">
+            <heading>submit.progressbar.describe.steptwo</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="photo_p1" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+
+        <step-definition id="video_alternative_p1" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+
+        <step-definition id="standarCIMMYT_p1" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="cgiar_initiatives_form" mandatory="true">
+            <heading>submit.progressbar.describe.steptwo</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+
+        <!-- CIMMYT -->
         <!-- This is the Sample/Fake Step which is used for testing only -->
         <step-definition id="sample">
             <heading>Sample</heading>
@@ -227,13 +263,6 @@
             <heading>submit.progressbar.sherpapolicy</heading>
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
-        </step-definition>
-
-        <!-- New step for show / mint identifiers -->
-        <step-definition id="identifiers">
-            <heading>submit.progressbar.identifiers</heading>
-            <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
-            <type>identifiers</type>
         </step-definition>
     </step-definitions>
 
@@ -259,9 +288,7 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-            <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
-                 that identifiers.cfg and identifier-service.xml are properly configured. -->
-            <!--<step id="identifiers"/>-->
+
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
@@ -284,8 +311,45 @@
             <step id="license"/>
         </submission-process>
 
+
+        <!-- CIMMYT -->
+
+        <submission-process name="standarCIMMYT">
+            <step id="collection"/>
+            <step id="standarCIMMYT_p1"/>
+            <step id="cgiar_initiatives_form"/>
+            <step id="upload"/>
+            <!-- <step id="license"/> -->
+        </submission-process>
+
+        <submission-process name="video_actualizada">
+            <step id="collection"/>
+            <step id="video_updated_p1"/>
+            <step id="video_updated_p2"/>
+            <step id="cgiar_initiatives_form"/>
+            <step id="upload"/>
+            <!-- <step id="license"/> -->
+        </submission-process>
+
+        <submission-process name="photo">
+            <step id="collection"/>
+            <step id="photo_p1"/>
+            <step id="cgiar_initiatives_form"/>
+            <step id="upload"/>
+            <step id="itemAccessConditions"/>
+        </submission-process>
+
+        <submission-process name="sas_latam">
+            <step id="collection"/>
+            <step id="sas_latam_p1"/>
+            <step id="cgiar_initiatives_form"/>
+            <step id="upload"/>
+            <!-- <step id="license"/> -->
+        </submission-process>
+        <!-- CIMMYT -->
+
         <!--
-        Submission Process for 'Publication' Entities.
+"presentations"        Submission Process for 'Publication' Entities.
         These are not to be confused with default Items, as Publications may be linked with other Entities
         (e.g. Person, JournalIssue, etc).
         To enable: create a collection for Publications and add it to the <submission-map> tag linking to this process
@@ -307,7 +371,7 @@
             <step id="collection"/>
             <step id="personStep"/>
             <step id="upload"/>
-            <step id="license"/>
+            <!-- <step id="license"/> -->
         </submission-process>
 
         <!--
