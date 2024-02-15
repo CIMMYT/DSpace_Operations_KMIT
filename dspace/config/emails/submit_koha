@@ -3,7 +3,7 @@
 ## {0}  Title of submission
 ## {1}  link to 'Private Items' page
 ##
-#set($subject = 'DSpace DEV: New item harvested')
+#set($subject = "${config.get('dspace.name')}: New item harvested")
 
 A new item has been harvested from koha:
 
