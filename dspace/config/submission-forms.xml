@@ -5196,6 +5196,10 @@
                 <stored-value>Forests, Trees and Agroforestry</stored-value>
             </pair>
             <pair>
+                <displayed-value>Gender Equality</displayed-value>
+                <stored-value>Gender Equality</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Genebanks</displayed-value>
                 <stored-value>Genebanks</stored-value>
             </pair>
@@ -5404,92 +5408,140 @@
 
         <!-- CGIAR Initiatives -->
 
-                <value-pairs value-pairs-name="cgiar_initiatives" dc-term="type">
+		<value-pairs value-pairs-name="cgiar_initiatives" dc-term="type">
+			<pair>
+				<displayed-value>Accelerated Breeding</displayed-value>
+				<stored-value>Accelerated Breeding</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>AgriLAC Resiliente</displayed-value>
+				<stored-value>AgriLAC Resiliente</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Agroecology</displayed-value>
+				<stored-value>Agroecology</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Aquatic Foods</displayed-value>
+				<stored-value>Aquatic Foods</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Asian Mega-Deltas</displayed-value>
+				<stored-value>Asian Mega-Deltas</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Breeding Resources</displayed-value>
+				<stored-value>Breeding Resources</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Climate Resilience</displayed-value>
+				<stored-value>Climate Resilience</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Digital Innovation</displayed-value>
+				<stored-value>Digital Innovation</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Diversification in East and Southern Africa</displayed-value>
+				<stored-value>Diversification in East and Southern Africa</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Excellence in Agronomy</displayed-value>
+				<stored-value>Excellence in Agronomy</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Foresight</displayed-value>
+				<stored-value>Foresight</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fragility to Resilience in Central and West Asia and North Africa</displayed-value>
+				<stored-value>Fragility to Resilience in Central and West Asia and North Africa</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fragility, Conflict, and Migration</displayed-value>
+				<stored-value>Fragility, Conflict, and Migration</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fruit and Vegetables for Sustainable Healthy Diets</displayed-value>
+				<stored-value>Fruit and Vegetables for Sustainable Healthy Diets</stored-value>
+			</pair>
             <pair>
-                <displayed-value>Accelerated Breeding</displayed-value>
-                <stored-value>Accelerated Breeding</stored-value>
+                    <displayed-value>Gender Equality</displayed-value>
+                    <stored-value>Gender Equality</stored-value>
             </pair>
+			<pair>
+				<displayed-value>Genebanks</displayed-value>
+				<stored-value>Genebanks</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Genome Editing</displayed-value>
+				<stored-value>Genome Editing</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Livestock and Climate</displayed-value>
+				<stored-value>Livestock and Climate</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Low-Emission Food Systems Initiative</displayed-value>
+				<stored-value>Low-Emission Food Systems Initiative</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Market Intelligence</displayed-value>
+				<stored-value>Market Intelligence</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Mixed Farming Systems</displayed-value>
+				<stored-value>Mixed Farming Systems</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>National Policies and Strategies</displayed-value>
+				<stored-value>National Policies and Strategies</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Nature-Positive Solutions</displayed-value>
+				<stored-value>Nature-Positive Solutions</stored-value>
+			</pair>
             <pair>
-                <displayed-value>AgriLAC Resiliente</displayed-value>
-                <stored-value>AgriLAC Resiliente</stored-value>
+                <displayed-value>NEXUS Gains</displayed-value>
+                <stored-value>NEXUS Gains</stored-value>
             </pair>
-            <pair>
-                <displayed-value>Agroecology</displayed-value>
-                <stored-value>Agroecology</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Asian Mega-Deltas</displayed-value>
-                <stored-value>Asian Mega-Deltas</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Breeding Resources</displayed-value>
-                <stored-value>Breeding Resources</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Climate Resilience</displayed-value>
-                <stored-value>Climate Resilience</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Digital Innovation</displayed-value>
-                <stored-value>Digital Innovation</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Diversification in East and Southern Africa</displayed-value>
-                <stored-value>Diversification in East and Southern Africa</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Excellence in Agronomy</displayed-value>
-                <stored-value>Excellence in Agronomy</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Foresight</displayed-value>
-                <stored-value>Foresight</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Fragility to Resilience in Central and West Asia and North Africa</displayed-value>
-                <stored-value>Fragility to Resilience in Central and West Asia and North Africa</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Genebanks</displayed-value>
-                <stored-value>Genebanks</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Low-Emission Food Systems Initiative</displayed-value>
-                <stored-value>Low-Emission Food Systems Initiative</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Market Intelligence</displayed-value>
-                <stored-value>Market Intelligence</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Mixed Farming Systems</displayed-value>
-                <stored-value>Mixed Farming Systems</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>National Policies and Strategies</displayed-value>
-                <stored-value>National Policies and Strategies</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Plant Health</displayed-value>
-                <stored-value>Plant Health</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Rethinking Food Markets</displayed-value>
-                <stored-value>Rethinking Food Markets</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Seed Equal</displayed-value>
-                <stored-value>Seed Equal</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Sustainable Animal Productivity</displayed-value>
-                <stored-value>Sustainable Animal Productivity</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Transforming Agrifood Systems in South Asia</displayed-value>
-                <stored-value>Transforming Agrifood Systems in South Asia</stored-value>
-            </pair>
-        </value-pairs>
+			<pair>
+				<displayed-value>One Health</displayed-value>
+				<stored-value>One Health</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Plant Health</displayed-value>
+				<stored-value>Plant Health</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Resilient Cities</displayed-value>
+				<stored-value>Resilient Cities</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Rethinking Food Markets</displayed-value>
+				<stored-value>Rethinking Food Markets</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Seed Equal</displayed-value>
+				<stored-value>Seed Equal</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sustainable Animal Productivity</displayed-value>
+				<stored-value>Sustainable Animal Productivity</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sustainable Healthy Diets</displayed-value>
+				<stored-value>Sustainable Healthy Diets</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Transforming Agrifood Systems in South Asia</displayed-value>
+				<stored-value>Transforming Agrifood Systems in South Asia</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>West and Central African Food Systems Transformation</displayed-value>
+				<stored-value>West and Central African Food Systems Transformation</stored-value>
+			</pair>
+		</value-pairs>
 
         <value-pairs value-pairs-name="cgiar_action_areas" dc-term="type">
             <pair>
