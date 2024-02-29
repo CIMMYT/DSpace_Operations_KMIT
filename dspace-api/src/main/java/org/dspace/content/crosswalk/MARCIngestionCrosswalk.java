@@ -601,7 +601,7 @@ public class MARCIngestionCrosswalk implements IngestionCrosswalk {
             for (String recipient : recipients) {
                 email.addRecipient(recipient);
             }
-            email.setSubject(configurationService.getProperty('dspace.name') + ": New item harvested");
+            email.setSubject(configurationService.getProperty("dspace.name") + ": New item harvested");
             email.addArgument(title);
             //email.addArgument(configurationService.getProperty("dspace.ui.url") + "/items/" + item_id.toString() + "/edit/status");
             email.addArgument(configurationService.getProperty("dspace.ui.url") + "/admin/search?f.discoverable=false,equals&spc.page=1&query=" + URLEncoder.encode(title.replace(":", " "), "UTF8"));
