@@ -1784,6 +1784,15 @@
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
+                    <dc-element>alternateName</dc-element>
+                    <label>Alternate name</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the last name of the person</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>person</dc-schema>
                     <dc-element>birthDate</dc-element>
                     <label>Birth date</label>
                     <input-type>date</input-type>
