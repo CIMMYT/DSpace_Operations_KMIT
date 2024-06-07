@@ -543,6 +543,13 @@ public class OAIHarvester {
         if (item != null) {
             log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
 
+            Boolean updateHarvestedItem = configurationService.getBooleanProperty("oai.harvest.update.item", false);
+            if (!updateHarvestedItem){
+                System.out.println("The Item update is disabled; skipping.");
+                log.info("Item " + item.getHandle() + " was harvested before; The Item update is disabled; skipping... ");
+                return;
+            }
+
             // FIXME: check for null pointer if for some odd reason we don't have a matching hi
             hi = harvestedItemService.find(ourContext, item);
 
