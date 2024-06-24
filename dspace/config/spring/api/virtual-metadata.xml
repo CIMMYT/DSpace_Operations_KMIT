@@ -17,6 +17,8 @@
                 <entry key="isEditorOfPublication" value-ref="isEditorOfPublicationMap"/>
                 <entry key="isIllustratorOfPublication" value-ref="isIllustratorOfPublicationMap"/>
                 <entry key="isOtherContributorOfPublication" value-ref="isOtherContributorOfPublicationMap"/>
+                <entry key="isWriterOfPublication" value-ref="isWriterOfPublicationMap"/>
+                <entry key="isTranslatorOfPublication" value-ref="isTranslatorOfPublicationMap"/>
                 <entry key="isOrgUnitOfPublication" value-ref="isOrgUnitOfPublicationMap"/>
                 <entry key="isPersonOfProject" value-ref="isPersonOfProjectMap"/>
                 <entry key="isOrgUnitOfProject" value-ref="isOrgUnitOfProjectMap"/>
@@ -135,7 +137,7 @@
     <!-- isOtherContributorOfPublicationMap -->
     
     <util:map id="isOtherContributorOfPublicationMap">
-        <entry key="dc.contributor.illustrator" value-ref="publicationOtherContributor"/>
+        <entry key="dc.contributor.other" value-ref="publicationOtherContributor"/>
     </util:map>
 
     <bean class="org.dspace.content.virtual.Concatenate" id="publicationOtherContributor">
@@ -149,6 +151,42 @@
     </bean>
 
     <!-- isOtherContributorOfPublicationMap -->
+
+    <!-- isWriterContributorOfPublicationMap -->
+    
+    <util:map id="isWriterOfPublicationMap">
+        <entry key="dc.contributor.writer" value-ref="publicationWriterContributor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationWriterContributor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isWriterContributorOfPublicationMap -->
+
+    <!-- isTranslatorOfPublicationMap -->
+    
+    <util:map id="isTranslatorOfPublicationMap">
+        <entry key="dc.contributor.translator" value-ref="publicationTranslatorContributor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationTranslatorContributor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isTranslatorOfPublicationMap -->
     
 
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
