@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -27,6 +28,8 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -34,6 +37,12 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
+import com.amazonaws.services.s3.model.UploadPartRequest;
+import com.amazonaws.services.s3.model.UploadPartResult;
+import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
+import com.amazonaws.services.s3.model.PartETag;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -47,6 +56,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,6 +111,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private String awsEndPoint;
     private boolean useRelativePath;
 
     /**
@@ -129,6 +140,13 @@ public class S3BitStoreService extends BaseBitStoreService {
      */
     private TransferManager tm = null;
 
+    /** 
+     * S3 multipart options 
+    */
+    private Boolean enableMultipart;
+    private Long ingestLimit;
+    private Long minPartSize;
+
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -146,6 +164,16 @@ public class S3BitStoreService extends BaseBitStoreService {
         return () -> AmazonS3ClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .withRegion(regions)
+                .build();
+    }
+
+    protected static Supplier<AmazonS3> amazonClientBuilderBy(
+            @NotNull AWSCredentials awsCredentials,
+            @NotNull EndpointConfiguration endpoint
+    ) {
+        return () -> AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withEndpointConfiguration(endpoint)
                 .build();
     }
 
@@ -191,14 +219,26 @@ public class S3BitStoreService extends BaseBitStoreService {
                         log.warn("Invalid aws_region: " + awsRegionName);
                     }
                 }
+                // Set Custom endpoint
                 // init client
-                s3Service = FunctionalUtils.getDefaultOrBuild(
-                        this.s3Service,
-                        amazonClientBuilderBy(
-                                regions,
-                                new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
-                                )
-                        );
+                if (StringUtils.isNotBlank(getAwsEndPoint())){
+                    s3Service = FunctionalUtils.getDefaultOrBuild(
+                            this.s3Service,
+                            amazonClientBuilderBy(
+                                    new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey()),
+                                    new AwsClientBuilder.EndpointConfiguration(getAwsEndPoint(), null)
+                                    )
+                            );
+                    log.warn("S3 Custom EndPoint set to: " + getAwsEndPoint());
+                } else {
+                    s3Service = FunctionalUtils.getDefaultOrBuild(
+                            this.s3Service,
+                            amazonClientBuilderBy(
+                                    regions,
+                                    new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
+                                    )
+                            );
+                }
                 log.warn("S3 Region set to: " + regions.getName());
             } else {
                 log.info("Using a IAM role or aws environment credentials");
@@ -283,17 +323,72 @@ public class S3BitStoreService extends BaseBitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
+
+        Long partSizeBytes = minPartSize * 1024 * 1024;
+        Long ingestLimitbytes = ingestLimit * 1024 * 1024;
+        
         try (
                 FileOutputStream fos = new FileOutputStream(scratchFile);
                 // Read through a digest input stream that will work out the MD5
                 DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
         ) {
+            
             Utils.bufferedCopy(dis, fos);
             in.close();
 
-            Upload upload = tm.upload(bucketName, key, scratchFile);
+            Long contentLength = Long.valueOf(scratchFile.length());
+            log.info("-----------------------------------------");
+            log.info("Filesize: " + FileUtils.byteCountToDisplaySize(contentLength));
+            log.info("minPartSize: " + FileUtils.byteCountToDisplaySize(minPartSize));
+            log.info("partSizeBytes: " + FileUtils.byteCountToDisplaySize(partSizeBytes));
+            log.info("enableMultipart: " + Boolean.toString(enableMultipart));
+            log.info("ingestLimitbytes: " + FileUtils.byteCountToDisplaySize(ingestLimitbytes));
+            log.info("-----------------------------------------");
 
-            upload.waitForUploadResult();
+            if (enableMultipart && (ingestLimitbytes < contentLength)){
+                log.info("This file will upload by multipart option");
+
+                //Official documentation https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpu-upload-object.html
+                // Create a list of ETag objects. You retrieve ETags for each object part
+                // uploaded,
+                // then, after each individual part has been uploaded, pass the list of ETags to
+                // the request to complete the upload.
+                List<PartETag> partETags = new ArrayList<PartETag>();
+                // Initiate the multipart upload.
+                InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, key);
+                InitiateMultipartUploadResult initResponse = s3Service.initiateMultipartUpload(initRequest);
+                // Upload the file parts.
+                long filePosition = 0;
+                for (int i = 1; filePosition < contentLength; i++) {
+                    // Because the last part could be less than 5 MB, adjust the part size as
+                    // needed.
+                    partSizeBytes = Math.min(partSizeBytes, (contentLength - filePosition));
+
+                    // Create the request to upload a part.
+                    UploadPartRequest uploadRequest = new UploadPartRequest()
+                            .withBucketName(bucketName)
+                            .withKey(key)
+                            .withUploadId(initResponse.getUploadId())
+                            .withPartNumber(i)
+                            .withFileOffset(filePosition)
+                            .withFile(scratchFile)
+                            .withPartSize(partSizeBytes);
+
+                    // Upload the part and add the response's ETag to our list.
+                    UploadPartResult uploadResult = s3Service.uploadPart(uploadRequest);
+                    partETags.add(uploadResult.getPartETag());
+
+                    filePosition += partSizeBytes;
+                }
+                // Complete the multipart upload.
+                CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, key,
+                        initResponse.getUploadId(), partETags);
+                s3Service.completeMultipartUpload(compRequest);
+            }
+            else{
+                Upload upload = tm.upload(bucketName, key, scratchFile);
+                upload.waitForUploadResult();
+            }
 
             bitstream.setSizeBytes(scratchFile.length());
             // we cannot use the S3 ETAG here as it could be not a MD5 in case of multipart upload (large files) or if
@@ -450,6 +545,15 @@ public class S3BitStoreService extends BaseBitStoreService {
         return awsAccessKey;
     }
 
+    public String getAwsEndPoint() {
+        return awsEndPoint;
+    }
+
+    @Autowired(required = true)
+    public void setAwsEndPoint(String awsEndPoint) {
+        this.awsEndPoint = awsEndPoint;
+    }
+
     @Autowired(required = true)
     public void setAwsAccessKey(String awsAccessKey) {
         this.awsAccessKey = awsAccessKey;
@@ -495,6 +599,31 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     public void setUseRelativePath(boolean useRelativePath) {
         this.useRelativePath = useRelativePath;
+    }
+
+    @Autowired(required = true)
+    public Boolean getEnableMultipart(){
+        return enableMultipart;
+    }
+
+    public void setEnableMultipart(Boolean enableMultipart){
+        this.enableMultipart = enableMultipart;
+    }
+
+    public Long getIngestLimit() {
+        return ingestLimit;
+    }
+
+    public void setIngestLimit(Long ingestLimit) {
+        this.ingestLimit = ingestLimit;
+    }
+
+    public Long getMinPartSize() {
+        return minPartSize;
+    }
+
+    public void setMinPartSize(Long minPartSize) {
+        this.minPartSize = minPartSize;
     }
 
     /**
