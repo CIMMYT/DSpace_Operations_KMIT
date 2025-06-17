@@ -19,7 +19,54 @@
     <submission-map>
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
+        <!-- Default submission process -->
 
+        <!-- Legal Projects community -->
+        <name-map collection-handle="20.500.12665/3033" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3034" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3035" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3036" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3037" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3038" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3039" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3040" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3041" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3042" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3043" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3524" submission-name="LegalDept"/>
+        <name-map collection-handle="20.500.12665/3723" submission-name="LegalDept"/>
+		<name-map collection-handle="20.500.12665/3724" submission-name="LegalDept"/>
+        <!-- Legal Projects community -->
+
+        <!-- KMIT Projects community -->
+		<name-map collection-handle="20.500.12665/3527" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3726" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3727" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3728" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3729" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3730" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3731" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3732" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3733" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3734" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3735" submission-name="KMITDept"/>
+		<name-map collection-handle="20.500.12665/3736" submission-name="KMITDept"/>
+		<!-- KMIT Projects community -->
+
+        <!-- Facilities Projects community -->
+		<name-map collection-handle="20.500.12665/3519" submission-name="FacilitiesDepartment"/>
+        <!-- Facilities Projects community -->
+
+        <!-- GermBank Projects community -->
+        <name-map collection-handle="20.500.12665/3705" submission-name="GermBankDepartment"/>
+        <!-- germplasm bank - Maize  - INTELLECTUAL PROPERTY RIGHTS  -->
+		<name-map collection-handle="20.500.12665/3706" submission-name="GermBankDepartment"/>
+		<!-- germplasm bank - Maize  - SEED HEALTH LABORATORY (SHL)   -->
+		<name-map collection-handle="20.500.12665/3707" submission-name="GermBankDepartment"/>
+		<!-- germplasm bank - Wheat  - INTELLECTUAL PROPERTY RIGHTS  -->
+		<name-map collection-handle="20.500.12665/3708" submission-name="GermBankDepartment"/>
+		<!-- germplasm bank - Wheat  - SEED HEALTH LABORATORY (SHL)  -->
+        <!-- GermBank Projects community -->
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
              This sets up the following Entity-based Collections in that dataset:
@@ -118,6 +165,47 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
+
+        <!-- Legal Department step definitions -->
+        <step-definition id="LegalDepartmenStepOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="LegalDepartmenStepTwo" mandatory="true">
+            <heading>submit.progressbar.describe.steptwo</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <!-- Legal Department step definitions -->
+
+        <!-- KMIT Department step definitions -->
+        <step-definition id="KMITDeptStepTwo" mandatory="true">
+            <heading>submit.progressbar.describe.steptwo</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <!-- KMIT Department step definitions -->
+
+        <!-- Facilities Department step definitions -->
+        <step-definition id="FacilitiesDepartmentStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <!-- Facilities Department step definitions -->
+
+        <!-- GermBank Department step definitions -->
+
+        <step-definition id="GermBankDepartmentStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <!-- GermBank Department step definitions -->
+
         <step-definition id="publicationStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -323,8 +411,46 @@
             <step id="publicationStep"/>
             <step id="traditionalpagetwo"/>
             <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+
+        <!-- Legal Departmen form-->
+        <submission-process name="LegalDept">
+            <step id="collection"/>
+            <step id="LegalDepartmenStepOne"/>
+            <step id="LegalDepartmenStepTwo"/>
+            <step id="upload"/>
             <step id="license"/>
         </submission-process>
+        <!-- Legal Departmen form-->
+
+        <!-- KMIT Departmen form-->
+        <submission-process name="KMITDept">
+            <step id="collection"/>
+            <step id="LegalDepartmenStepOne"/>
+            <step id="KMITDeptStepTwo"/>
+            <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+        <!-- KMIT Departmen form-->
+
+        <!-- Facilities Department step definitions -->
+        <submission-process name="FacilitiesDepartment">
+            <step id="collection"/>
+            <step id="FacilitiesDepartmentStep"/>
+            <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+        <!-- Facilities Department step definitions -->
+
+        <!-- GermBank Department step definitions -->
+        <submission-process name="GermBankDepartment">
+            <step id="collection"/>
+            <step id="GermBankDepartmentStep"/>
+            <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+        <!-- GermBank Department step definitions -->
 
         <!--
         Submission Process for 'Person' Entities
