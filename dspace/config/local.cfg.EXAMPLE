@@ -38,7 +38,7 @@ dspace.dir=/dspace
 # NOTE: This URL must be accessible to all DSpace users (should not use 'localhost' in Production)
 # and is usually "synced" with the "rest" section in the DSpace User Interface's config.*.yml.
 # It corresponds to the URL that you would type into your browser to access the REST API.
-dspace.server.url = http://localhost:8080/server
+dspace.server.url = https://digitalassets.cimmyt.org/server
 
 # Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
 # May require a port number if not using standard ports (80 or 443)
@@ -50,10 +50,10 @@ dspace.server.ssr.url = ${dspace.server.url}
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
 # NOTE: this URL must be accessible to all DSpace users (should not use 'localhost' in Production).
 # It corresponds to the URL that you would type into your browser to access the User Interface.
-dspace.ui.url = http://localhost:4000
+dspace.ui.url = https://digitalassets.cimmyt.org
 
 # Name of the site
-dspace.name = DSpace at My University
+dspace.name =  Digital Assets Management Repository
 
 # Assetstore configurations have moved to config/modules/assetstore.cfg
 # and config/spring/api/bitstore.xml.
@@ -104,25 +104,25 @@ db.password = dspace
 #######################
 
 # SMTP mail server (allows DSpace to send email notifications)
-#mail.server = smtp.example.com
+mail.server = localhost
 
 # SMTP mail server authentication username and password (if required)
 #mail.server.username = myusername
 #mail.server.password = mypassword
 
 # SMTP mail server alternate port (defaults to 25)
-#mail.server.port = 25
+mail.server.port = 25
 
 # From address for mail
 # All mail from the DSpace site will use this 'from' address
-#mail.from.address = dspace-noreply@myu.edu
+mail.from.address = CIMMYT-Knowledge-Center@cgiar.org
 
 # When feedback is submitted via the Feedback form, it is sent to this address
 # Currently limited to one recipient!
-#feedback.recipient = dspace-help@myu.edu
+feedback.recipient =  a.tenorio@cgiar.org, a.zuniga@cgiar.org
 
 # General site administration (Webmaster) e-mail
-#mail.admin = dspace-help@myu.edu
+mail.admin = ${mail.admin}
 
 # Helpdesk E-mail
 #mail.helpdesk = ${mail.admin}
@@ -157,7 +157,7 @@ db.password = dspace
 
 # CNRI Handle prefix
 # (Defaults to the reserved dummy/fake prefix of 123456789)
-#handle.prefix = 123456789
+handle.prefix =  20.500.12665
 
 #######################
 # PROXY CONFIGURATION #
@@ -188,7 +188,7 @@ db.password = dspace
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication
 
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
-#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
 
 # OIDC authentication/authorization. See authenication-oidc.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OidcAuthentication
@@ -205,7 +205,7 @@ db.password = dspace
 
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
-#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
 
 #####################
 # REST API SETTINGS #
@@ -218,7 +218,7 @@ db.password = dspace
 # When an external authentication system is involved like Shibboleth some browsers (i.e. Safari) include
 # in the request the Origin header with the url of the IdP. In such case you need to allow also the IdP to
 # avoid trouble for such browsers (i.e.  rest.cors.allowed-origins = ${dspace.ui.url}, https://samltest.id )
-#rest.cors.allowed-origins = ${dspace.ui.url}
+rest.cors.allowed-origins = ${dspace.ui.url}
 
 #################################################
 # SPRING BOOT SETTINGS (Used by Server Webapp)  #
