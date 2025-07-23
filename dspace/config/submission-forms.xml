@@ -386,7 +386,7 @@
         </form>
 
         <!-- Legal Departmen forms definitions -->
-        <form name="LegalDepartmenStepOne">
+        <form name="LegalDeptStepOne">
             <row>
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -491,7 +491,7 @@
             </row>
         </form>
 
-        <form name="LegalDepartmenStepTwo">
+        <form name="LegalDeptStepTwo">
             <row>
                <field>
 					<dc-schema>cimmyt</dc-schema>
@@ -569,7 +569,7 @@
         <!-- Legal Departmen forms definitions -->
 
         <!-- KMIT Departmen forms definitions -->
-        <form name="KMITDepartmentStepTwo">
+        <form name="KMITDeptStepTwo">
             <row>
                <field>
 					<dc-schema>cimmyt</dc-schema>
@@ -690,7 +690,7 @@
         <!-- KMIT Departmen forms definitions -->
 
 		<!-- Facilities Departmen forms definitions -->
-		<form name="FacilitiesDepartmentStep">
+		<form name="FacilitiesDeptStepOne">
 			<row>
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -851,7 +851,7 @@
 		<!-- Facilities Departmen forms definitions -->
 
 		<!-- GermBank Department form definitions -->
-		<form name="GermBankDepartmentStep">
+		<form name="GermBankDeptStep">
 			<row>
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -974,6 +974,552 @@
 			</row>
 		</form>
 		<!-- GermBank Department form definitions -->
+
+        <!-- CSISA form definition -->
+        <form name="CSISAPhotoStepOne">
+            <row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<repeatable>false</repeatable>
+					<label>Album title</label>
+					<input-type>onebox</input-type>
+					<hint></hint>
+					<required>Title assigned to the album.</required>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<dc-qualifier>alternative</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Alternative title</label>
+					<input-type>onebox</input-type>
+					<hint>Alternative title of the album e.g. the title in other language.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>creator</dc-element>
+					<repeatable>true</repeatable>
+					<label>Photographer</label>
+					<input-type>name</input-type>
+					<hint>Name of the photographer who took the photos in the album.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<repeatable>true</repeatable>
+					<label>Place of publication</label>
+					<!-- <input-type>onebox</input-type> -->
+					<input-type value-pairs-name="csisa_countries">dropdown</input-type>
+					<hint>Country in which the photograph was taken.</hint>
+					<required></required>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>spatial</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Historical Coverage</label>
+					<input-type>onebox</input-type>
+					<hint>Add information concerning a specific era or historical event related to the resource, e.g. Independence, World War I.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Publication date</label>
+					<input-type>date</input-type>
+					<hint>Year in which the photograph was taken.</hint>
+					<required>You must enter at least the year.</required>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<repeatable>true</repeatable>
+					<label>Description or Resumen</label>
+					<input-type>textarea</input-type>
+					<hint>Please provide a brief description of the photograph that may be helpful in its search and retrieving.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>physical</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Physical description</label>
+					<input-type>textarea</input-type>
+					<hint>Add information related to the physical format of the photograph, e.g., negative</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>size</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Format size</label>
+					<input-type>onebox</input-type>
+					<hint>Add information related to the size of the physical format of the photograph, e.g., 4"x6"</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>agrovoc</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Agrovoc</label>
+					<input-type>tag</input-type>
+					<hint>Add the appropriate AGROVOC term which best describes the photograph.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>keywords</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Keywords</label>
+					<input-type>tag</input-type>
+					<hint>Add other terms that might be useful when searching for this photograph.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>personal</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Personal</label>
+					<input-type>tag</input-type>
+					<hint>Add information about the people who appear in the photograph.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<repeatable>false</repeatable>
+					<label>Format</label>
+					<input-type value-pairs-name="csisa_photo_common_format">list</input-type>
+					<hint>Please select the format of the photograph e.g. PNG, GIF.</hint>
+				</field>
+            </row>
+        </form>
+
+        <form name="CSISAStepTwo">
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>audience</dc-element>
+					<repeatable>true</repeatable>
+					<label>Audience</label>
+					<input-type value-pairs-name="csisa_audience">dropdown</input-type>
+					<hint>Please select one or more intended audiences for the resource, e.g. General public, Researchers, Students.</hint>
+					<required>Select appropriate audience.</required>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<repeatable>true</repeatable>
+					<label>Publisher</label>
+					<input-type value-pairs-name="csisa_publisher">dropdown</input-type>
+					<hint>Please select the institution or institutions that provided funding to publish the photograph.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>relation</dc-element>
+					<repeatable>true</repeatable>
+					<label>Relation</label>
+					<input-type>onebox</input-type>
+					<hint>Handle or other identifier, where another version or other element that is related to this photograph is located.</hint>
+				</field>
+            </row>
+            <row>
+                <field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>other</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Specific Location Coverage</label>
+					<input-type>onebox</input-type>
+					<hint>Please add information related to specific places, such as localities, cities, towns, etc. in which the photograph was taken.</hint>
+				</field>
+            </row>
+        </form>
+
+		<form name="CSISAVideoStepOne">
+            <row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<dc-qualifier/>
+					<repeatable>false</repeatable>
+					<label>Video title</label>
+					<input-type>onebox</input-type>
+					<hint></hint>
+					<required>Title assigned to the video.</required>
+				</field>
+            </row>
+            <row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<dc-qualifier>alternative</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Alternative title</label>
+					<input-type>onebox</input-type>
+					<hint>Alternative title of the video e.g. the title in other language.</hint>
+				</field>
+            </row>
+            <row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>director</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Director</label>
+					<input-type>name</input-type>
+					<hint>Name of the director of the video.</hint>
+				</field>
+            </row>
+            <row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Place of publication</label>
+					<!-- <input-type>onebox</input-type> -->
+					<input-type value-pairs-name="csisa_countries">dropdown</input-type>
+					<hint>Country in which the video was recorded.</hint>
+					<required></required>
+				</field>
+            </row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>spatial</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Historical Coverage</label>
+					<input-type>onebox</input-type>
+					<hint>Add information concerning a specific era or historical event related to the resource, e.g. Independence, World War I.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Publication date</label>
+					<input-type>date</input-type>
+					<hint>Year in which the video was taken.</hint>
+					<required>You must enter at least the year.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier/>
+					<repeatable>true</repeatable>
+					<label>Description or Resumen</label>
+					<input-type>textarea</input-type>
+					<hint>Please provide a brief description of the video that may be helpful in its search and retrieving.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>physical</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Physical description</label>
+					<input-type>textarea</input-type>
+					<hint>Add information related to the physical format of the photograph, e.g., negative</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>size</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Format size</label>
+					<input-type>onebox</input-type>
+					<hint></hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>agrovoc</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Agrovoc</label>
+					<input-type>tag</input-type>
+					<hint>Add the appropriate AGROVOC term which best describes the video.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>keywords</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Keywords</label>
+					<input-type>tag</input-type>
+					<hint>Add other terms that might be useful when searching for this video.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>personal</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Personal</label>
+					<input-type>onebox</input-type>
+					<hint>Add information about the people who appear in the video.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<dc-qualifier/>
+					<repeatable>false</repeatable>
+					<label>Format</label>
+					<input-type value-pairs-name="csisa_video_common_format">list</input-type>
+					<hint>Please select the format of the video, e.g. MP4, MOV.</hint>
+				</field>
+			</row>
+        </form>
+
+        <!-- CSISA form definition -->
+
+		<!-- KMIT Archive form definition -->
+		<form name="KMITArchiveStep">
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<repeatable>false</repeatable>
+					<label>Title</label>
+					<input-type>onebox</input-type>
+					<hint>Enter the main title of the item.</hint>
+					<required>You must enter a main title for this item.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>creator</dc-element>
+					<repeatable>true</repeatable>
+					<label>Authors</label>
+					<input-type>name</input-type>
+					<hint>Enter the names of the authors of this item.</hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>cimmyt</dc-schema>
+					<dc-element>sender</dc-element>
+					<repeatable>true</repeatable>
+					<label>Sender</label>
+					<input-type>name</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>cimmyt</dc-schema>
+					<dc-element>recipient</dc-element>
+					<repeatable>true</repeatable>
+					<label>Recipient</label>
+					<input-type>name</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>cimmyt</dc-schema>
+					<dc-element>affiliation</dc-element>
+					<repeatable>true</repeatable>
+					<label>	Affiliation</label>
+					<input-type>onebox</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<repeatable>false</repeatable>
+					<label>Description</label>
+					<input-type>textarea</input-type>
+					<hint></hint>
+					<required></required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>countryfocus</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Country Focus</label>
+					<input-type>onebox</input-type>
+					<hint></hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Date of Issue</label>
+					<input-type>date</input-type>
+					<hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't
+                        applicable.</hint>
+					<required>You must enter at least the year.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>language</dc-element>
+					<repeatable>true</repeatable>
+					<label>Language</label>
+					<input-type value-pairs-name="dc_language">dropdown</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>other</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Notes</label>
+					<input-type>textarea</input-type>
+					<hint>Enter the description of the item.</hint>
+					<required></required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>keywords</dc-qualifier>
+					<!-- An input-type of twobox MUST be marked as repeatable -->
+					<repeatable>true</repeatable>
+					<label>Keywords</label>
+					<input-type>tag</input-type>
+					<hint></hint>
+					<required>Enter appropriate subject keywords.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>personal</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Personal Subject</label>
+					<input-type>tag</input-type>
+					<hint></hint>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier/>
+					<repeatable>true</repeatable>
+					<label>Subject</label>
+					<input-type>tag</input-type>
+					<hint></hint>
+					<required></required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>rights</dc-element>
+					<dc-qualifier>accesslevel</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Access level</label>
+					<input-type value-pairs-name="common_accesslevel">dropdown</input-type>
+					<hint></hint>
+					<required>Select appropriate Access level.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<repeatable>false</repeatable>
+					<label>Format</label>
+					<input-type value-pairs-name="common_format">dropdown</input-type>
+					<hint></hint>
+					<required>Select appropriate Format.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>type</dc-element>
+					<dc-qualifier>publicationversion</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Publication version</label>
+					<input-type value-pairs-name="common_publicationversion">dropdown</input-type>
+					<hint></hint>
+					<required>Select appropriate Publication version.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<repeatable>false</repeatable>
+					<label>Publisher</label>
+					<input-type value-pairs-name="common_publisher">dropdown</input-type>
+					<hint></hint>
+					<required>Select the name of the publisher of the previously issued instance of this item.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>relation</dc-element>
+					<repeatable>false</repeatable>
+					<label>Relation</label>
+					<input-type>onebox</input-type>
+					<hint></hint>
+					<required></required>
+				</field>
+			</row>
+		</form>
+		<!-- KMIT Archive form definition -->
 
 		<!-- Form which defines the first metadata page/section for depositing Person Entities.
 			 This is used to deposit Person Entities, which are often used as Authors of Publications. -->
@@ -4413,6 +4959,271 @@
 				<stored-value>Updated Version</stored-value>
 			</pair>
 		</value-pairs>
+
+        <value-pairs value-pairs-name="csisa_countries" dc-term="countries">
+			<pair>
+				<displayed-value>Afghanistan</displayed-value>
+				<stored-value>Afghanistan</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Bangladesh</displayed-value>
+				<stored-value>Bangladesh</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Bhutan</displayed-value>
+				<stored-value>Bhutan</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>India</displayed-value>
+				<stored-value>India</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Maldives</displayed-value>
+				<stored-value>Maldives</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Nepal</displayed-value>
+				<stored-value>Nepal</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Pakistan</displayed-value>
+				<stored-value>Pakistan</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sri Lanka</displayed-value>
+				<stored-value>Sri Lanka</stored-value>
+			</pair>
+		</value-pairs>
+
+        <value-pairs value-pairs-name="csisa_photo_common_format" dc-term="format">
+			<pair>
+				<displayed-value>JPEG</displayed-value>
+				<stored-value>JPEG</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>GIF</displayed-value>
+				<stored-value>GIF</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>PNG</displayed-value>
+				<stored-value>PNG</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>TIFF</displayed-value>
+				<stored-value>TIFF</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>AIFF</displayed-value>
+				<stored-value>AIFF</stored-value>
+			</pair>
+		</value-pairs>
+
+        <value-pairs value-pairs-name="csisa_audience" dc-term="audience">
+			<pair>
+				<displayed-value>Administrators</displayed-value>
+				<stored-value>Administrators</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Agricultura Producers</displayed-value>
+				<stored-value>Agricultura Producers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Community Groups</displayed-value>
+				<stored-value>Community Groups</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Counsellors</displayed-value>
+				<stored-value>Counsellors</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Federal Funds Recipients and Applicants</displayed-value>
+				<stored-value>Federal Funds Recipients and Applicants</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>General Public</displayed-value>
+				<stored-value>General Public</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Librarians</displayed-value>
+				<stored-value>Librarians</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Municipal Government</displayed-value>
+				<stored-value>Municipal Government</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>News Media</displayed-value>
+				<stored-value>News Media</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Other</displayed-value>
+				<stored-value>Other</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Parents and Families</displayed-value>
+				<stored-value>Parents and Families</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Policymakers</displayed-value>
+				<stored-value>Policymakers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Researchers</displayed-value>
+				<stored-value>Researchers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Rural Agirultural Organizations</displayed-value>
+				<stored-value>Rural Agirultural Organizations</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>School Support Staff</displayed-value>
+				<stored-value>School Support Staff</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Student Financial Aid Providers</displayed-value>
+				<stored-value>Student Financial Aid Providers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Students</displayed-value>
+				<stored-value>Students</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Teachers</displayed-value>
+				<stored-value>Teachers</stored-value>
+			</pair>
+		</value-pairs>
+
+        <value-pairs value-pairs-name="csisa_publisher" dc-term="publisher">
+			<pair>
+				<displayed-value>International Maize and Wheat Improvement Center (CIMMYT)</displayed-value>
+				<stored-value>International Maize and Wheat Improvement Center (CIMMYT)</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>International Food Policy Research Institute (IFPRI)</displayed-value>
+				<stored-value>International Food Policy Research Institute (IFPRI)</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>International Rice Research Institute (IRRI)</displayed-value>
+				<stored-value>International Rice Research Institute (IRRI)</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>International Water Management Institute (IWMI)</displayed-value>
+				<stored-value>International Water Management Institute (IWMI)</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="csisa_video_common_format" dc-term="format">
+			<pair>
+				<displayed-value>MP4</displayed-value>
+				<stored-value>MP4</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>MOV</displayed-value>
+				<stored-value>MOV</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>WMV</displayed-value>
+				<stored-value>WMV</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>AVI</displayed-value>
+				<stored-value>AVI</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>AVCHD</displayed-value>
+				<stored-value>AVCHD</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>FLV</displayed-value>
+				<stored-value>FLV</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>F4V</displayed-value>
+				<stored-value>F4V</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>SWF</displayed-value>
+				<stored-value>SWF</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>MKV</displayed-value>
+				<stored-value>MKV</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>WEBM</displayed-value>
+				<stored-value>WEBM</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>HTML5</displayed-value>
+				<stored-value>HTML5</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>MPEG-2</displayed-value>
+				<stored-value>MPEG-2</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_format" dc-term="format">
+			<pair>
+				<displayed-value>PDF</displayed-value>
+				<stored-value>PDF</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>DOC</displayed-value>
+				<stored-value>DOC</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>PPTX</displayed-value>
+				<stored-value>PPTX</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>PPT</displayed-value>
+				<stored-value>PPT</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>XML</displayed-value>
+				<stored-value>XML</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Other</displayed-value>
+				<stored-value>Other</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_accesslevel" dc-term="accesslevel">
+			<pair>
+				<displayed-value>Restricted Access</displayed-value>
+				<stored-value>Restricted Access</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Open Access</displayed-value>
+				<stored-value>Open Access</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Closed Access</displayed-value>
+				<stored-value>Closed Access</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Embargoed Access</displayed-value>
+				<stored-value>Embargoed Access</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Private</displayed-value>
+				<stored-value>Private</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_publisher" dc-term="publisher">
+			<pair>
+				<displayed-value>CIMMYT</displayed-value>
+				<stored-value>CIMMYT</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Other</displayed-value>
+				<stored-value>Other</stored-value>
+			</pair>
+		</value-pairs>
+
     </form-value-pairs>
 
 </input-forms>
