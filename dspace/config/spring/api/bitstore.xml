@@ -19,6 +19,7 @@
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton" lazy-init="true">
         <property name="enabled" value="${assetstore.s3.enabled}"/>
+        <property name="awsEndPoint" value="${assetstore.s3.awsEndPoint}"/>
         <!-- AWS Security credentials, with policies for specified bucket -->
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>
         <property name="awsSecretKey" value="${assetstore.s3.awsSecretKey}"/>
@@ -34,8 +35,13 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
-    </bean>
 
+        <!-- Enable if you must use multipart upload default false-->
+        <property name="enableMultipart" value="${assetstore.s3.enableMultipart}"/>
+        <!-- Optional, enable if you must use multipart upload -->
+        <property name="ingestLimit" value="${assetstore.s3.ingestLimit}"/>
+        <property name="minPartSize" value="${assetstore.s3.minPartSize}"/>
+    </bean>
     <!-- <bean name="localStore2 ... -->
     <!-- <bean name="s3Store2 ... -->
 </beans>
