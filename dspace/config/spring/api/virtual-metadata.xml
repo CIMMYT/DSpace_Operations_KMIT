@@ -12,6 +12,13 @@
                  are to be added to the item that has a relationship with this relationship type-->
             <map>
                 <entry key="isAuthorOfPublication" value-ref="isAuthorOfPublicationMap"/>
+                <entry key="isPhotographerOfPublication" value-ref="isPhotographerOfPublicationMap"/>
+                <entry key="isProductorOfPublication" value-ref="isProductorOfPublicationMap"/>
+                <entry key="isEditorOfPublication" value-ref="isEditorOfPublicationMap"/>
+                <entry key="isIllustratorOfPublication" value-ref="isIllustratorOfPublicationMap"/>
+                <entry key="isOtherContributorOfPublication" value-ref="isOtherContributorOfPublicationMap"/>
+                <entry key="isWriterOfPublication" value-ref="isWriterOfPublicationMap"/>
+                <entry key="isTranslatorOfPublication" value-ref="isTranslatorOfPublicationMap"/>
                 <entry key="isOrgUnitOfPublication" value-ref="isOrgUnitOfPublicationMap"/>
                 <entry key="isPersonOfProject" value-ref="isPersonOfProjectMap"/>
                 <entry key="isOrgUnitOfProject" value-ref="isOrgUnitOfProjectMap"/>
@@ -35,11 +42,8 @@
         </property>
     </bean>
 
-    <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
-         'dc.contributor.author' on the appropriate item with the values defined in the value-ref.
-          This value-ref should be a bean of type VirtualMetadataConfiguration -->
     <util:map id="isAuthorOfPublicationMap">
-        <entry key="dc.contributor.author" value-ref="publicationAuthor_author"/>
+        <entry key="dc.creator" value-ref="publicationAuthor_author"/>
     </util:map>
     <!--
          If the related item has:
@@ -50,23 +54,146 @@
     <bean class="org.dspace.content.virtual.Concatenate" id="publicationAuthor_author">
         <property name="fields">
             <util:list>
-                <value>person.familyName</value>
-                <value>person.givenName</value>
-                <value>organization.legalName</value>
+                <value>person.alternateName</value>
             </util:list>
-        </property>
-        <property name="separator">
-            <value>, </value>
         </property>
         <property name="useForPlace" value="true"/>
         <property name="populateWithNameVariant" value="true"/>
     </bean>
 
+
+    <!-- isPhotographerOfPublicationMap -->
+    
+    <util:map id="isPhotographerOfPublicationMap">
+        <entry key="dc.contributor.photographer" value-ref="publicationPhotographer_author"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationPhotographer_author">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isPhotographerOfPublicationMap -->
+
+    <!-- isProductorOfPublicationMap -->
+    
+    <util:map id="isProductorOfPublicationMap">
+        <entry key="dc.contributor.producer" value-ref="publicationProducer"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationProducer">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isProductorOfPublicationMap -->
+
+    <!-- isEditorOfPublicationMap -->
+    
+    <util:map id="isEditorOfPublicationMap">
+        <entry key="dc.contributor.editor" value-ref="publicationEditor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationEditor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isEditorOfPublicationMap -->
+
+    <!-- isIllustratorOfPublicationMap -->
+    
+    <util:map id="isIllustratorOfPublicationMap">
+        <entry key="dc.contributor.illustrator" value-ref="publicationIllustrator"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationIllustrator">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isIllustratorOfPublicationMap -->
+
+    <!-- isOtherContributorOfPublicationMap -->
+    
+    <util:map id="isOtherContributorOfPublicationMap">
+        <entry key="dc.contributor.other" value-ref="publicationOtherContributor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationOtherContributor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isOtherContributorOfPublicationMap -->
+
+    <!-- isWriterContributorOfPublicationMap -->
+    
+    <util:map id="isWriterOfPublicationMap">
+        <entry key="dc.contributor.writer" value-ref="publicationWriterContributor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationWriterContributor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isWriterContributorOfPublicationMap -->
+
+    <!-- isTranslatorOfPublicationMap -->
+    
+    <util:map id="isTranslatorOfPublicationMap">
+        <entry key="dc.contributor.translator" value-ref="publicationTranslatorContributor"/>
+    </util:map>
+
+    <bean class="org.dspace.content.virtual.Concatenate" id="publicationTranslatorContributor">
+        <property name="fields">
+            <util:list>
+                <value>person.alternateName</value>
+            </util:list>
+        </property>
+        <property name="useForPlace" value="true"/>
+        <property name="populateWithNameVariant" value="true"/>
+    </bean>
+
+    <!-- isTranslatorOfPublicationMap -->
+    
+
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'dc.contributor.other' on the appropriate item with the values defined in the value-ref.
       This value-ref should be a bean of type VirtualMetadataConfiguration -->
     <util:map id="isOrgUnitOfPublicationMap">
-        <entry key="dc.contributor.other" value-ref="publicationOrgUnit_name"/>
+        <entry key="dc.creator.corporate" value-ref="publicationOrgUnit_name"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="publicationOrgUnit_name">
         <property name="fields">
