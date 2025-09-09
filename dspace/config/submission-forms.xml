@@ -43,7 +43,7 @@
                     <label>Description</label>
                     <input-type>textarea</input-type>
                     <hint>Enter a description for the file</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -60,7 +60,7 @@
                     <label>Author</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -84,7 +84,7 @@
                     <label>Other Titles</label>
                     <input-type>onebox</input-type>
                     <hint>If the item has any alternative titles, please enter them here.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -111,7 +111,7 @@
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -123,7 +123,7 @@
                     <label>Citation</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the standard citation for the previously issued instance of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -135,7 +135,7 @@
                     <label>Series/Report No.</label>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -150,7 +150,7 @@
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -178,7 +178,7 @@
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -196,8 +196,6 @@
                     <label>Subject Keywords</label>
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
-                    <required></required>
-                    <vocabulary>srsc</vocabulary>
                 </field>
             </row>
             <row>
@@ -209,7 +207,7 @@
                     <label>Abstract</label>
                     <input-type>textarea</input-type>
                     <hint>Enter the abstract of the item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -221,7 +219,7 @@
                     <label>Sponsors</label>
                     <input-type>textarea</input-type>
                     <hint>Enter the names of any sponsors and/or funding codes in the box.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -233,7 +231,7 @@
                     <label>Description</label>
                     <input-type>textarea</input-type>
                     <hint>Enter any other description or comments in this box.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -257,7 +255,7 @@
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
                     <externalsources>orcid</externalsources>
-                    <required></required>
+                    <required>true</required>
                     <!-- You may choose to validate author names via a Regular Expression if it's appropriate for
                          your institution. The below regex requires a comma to be present in the author field.
                          However, this is disabled by default to support organizations as authors, etc. -->
@@ -285,7 +283,7 @@
                     <label>Other Titles</label>
                     <input-type>onebox</input-type>
                     <hint>If the item has any alternative titles, please enter them here.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -312,7 +310,7 @@
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -324,7 +322,7 @@
                     <label>Citation</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the standard citation for the previously issued instance of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -336,7 +334,7 @@
                     <label>Series/Report No.</label>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -351,7 +349,7 @@
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -380,7 +378,7 @@
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -407,8 +405,7 @@
 					<repeatable>false</repeatable>
 					<label>Provider/ Client</label>
 					<input-type>onebox</input-type>
-					<hint/>
-					<required></required>
+					<hint></hint>
 				</field>
 			</row>
 			<row>
@@ -442,7 +439,6 @@
 					<label>Currency</label>
 					<input-type value-pairs-name="divisas_types">dropdown</input-type>
 					<hint>Select the Currency related to this agreement/document</hint>
-					<required></required>
 				</field>
 			</row>
 			<row>
@@ -453,8 +449,6 @@
 					<repeatable>false</repeatable>
 					<label>Amount</label>
 					<input-type>onebox</input-type>
-					<hint/>
-					<required></required>
 				</field>
 			</row>
 			<row>
@@ -465,8 +459,6 @@
 					<repeatable>false</repeatable>
 					<label>Status</label>
 					<input-type value-pairs-name="legal_status">dropdown</input-type>
-					<hint/>
-					<required></required>
 				</field>
 			</row>
 			<row>
@@ -630,7 +622,6 @@
 					<repeatable>true</repeatable>
 					<label>Keywords</label>
 					<input-type>tag</input-type>
-					<hint/>
 				</field>
 			</row>
 			<row>
@@ -897,7 +888,6 @@
 					<label>Keywords</label>
 					<input-type>tag</input-type>
 					<hint>Keywords relate to documents or topic work in Grin Global System</hint>
-					<required/>
 				</field>
 			</row>
 			<row>
@@ -909,7 +899,6 @@
 					<label>Notes</label>
 					<input-type>textarea</input-type>
 					<hint>The relevant or complementary information related to the contents document.</hint>
-					<required/>
 				</field>
 			</row>
 			<row>
@@ -1018,7 +1007,7 @@
 					<!-- <input-type>onebox</input-type> -->
 					<input-type value-pairs-name="csisa_countries">dropdown</input-type>
 					<hint>Country in which the photograph was taken.</hint>
-					<required></required>
+					<required>true</required>
 				</field>
             </row>
             <row>
@@ -1211,7 +1200,7 @@
 					<!-- <input-type>onebox</input-type> -->
 					<input-type value-pairs-name="csisa_countries">dropdown</input-type>
 					<hint>Country in which the video was recorded.</hint>
-					<required></required>
+					<required>true</required>
 				</field>
             </row>
 			<row>
@@ -1376,7 +1365,7 @@
 					<label>Description</label>
 					<input-type>textarea</input-type>
 					<hint></hint>
-					<required></required>
+					<required>true</required>
 				</field>
 			</row>
 			<row>
@@ -1422,7 +1411,6 @@
 					<label>Notes</label>
 					<input-type>textarea</input-type>
 					<hint>Enter the description of the item.</hint>
-					<required></required>
 				</field>
 			</row>
 			<row>
@@ -1435,7 +1423,6 @@
 					<label>Keywords</label>
 					<input-type>tag</input-type>
 					<hint></hint>
-					<required>Enter appropriate subject keywords.</required>
 				</field>
 			</row>
 			<row>
@@ -1457,8 +1444,6 @@
 					<repeatable>true</repeatable>
 					<label>Subject</label>
 					<input-type>tag</input-type>
-					<hint></hint>
-					<required></required>
 				</field>
 			</row>
 			<row>
@@ -1514,8 +1499,64 @@
 					<repeatable>false</repeatable>
 					<label>Relation</label>
 					<input-type>onebox</input-type>
-					<hint></hint>
-					<required></required>
+				</field>
+			</row>
+			<row>				
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>audience</dc-element>
+					<repeatable>true</repeatable>
+					<label>Audience</label>
+					<input-type value-pairs-name="common_audience">dropdown</input-type>
+					<required>Select appropriate audience.</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>type</dc-element>
+					<repeatable>true</repeatable>
+					<label>Type</label>
+					<input-type>onebox</input-type>
+					<required>true</required>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>cimmyt</dc-schema>
+					<dc-element>box</dc-element>
+					<repeatable>false</repeatable>
+					<label>Box</label>
+					<input-type>onebox</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>cimmyt</dc-schema>
+					<dc-element>folder</dc-element>
+					<repeatable>false</repeatable>
+					<label>Folder</label>
+					<input-type>onebox</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>physical</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Physical Description</label>
+					<input-type>onebox</input-type>
+				</field>
+			</row>
+			<row>
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>pages</dc-qualifier>
+					<repeatable>false</repeatable>
+					<label>Pages</label>
+					<input-type>onebox</input-type>
 				</field>
 			</row>
 		</form>
@@ -1710,7 +1751,7 @@
                     <dc-element>subject</dc-element>
                     <repeatable>true</repeatable>
                     <label>Keywords</label>
-                    <input-type>onebox</input-type>
+                    <input-type>tag</input-type>
                     <hint>Enter the keywords of the project</hint>
                 </field>
             </row>
@@ -1971,7 +2012,7 @@
                     <dc-element>keywords</dc-element>
                     <repeatable>true</repeatable>
                     <label>Keywords</label>
-                    <input-type>onebox</input-type>
+                    <input-type>tag</input-type>
                     <hint>Enter the keywords of the journal issue</hint>
                 </field>
             </row>
@@ -2002,7 +2043,7 @@
                     <label>Other Titles</label>
                     <input-type>onebox</input-type>
                     <hint>If the item has any alternative titles, please enter them here.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2052,7 +2093,7 @@
                     <style>col-sm-8</style>
                     <input-type>onebox</input-type>
                     <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2064,7 +2105,7 @@
                     <label>Editor Version</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the URL/DOI of the editor version of this item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2076,7 +2117,7 @@
                     <label>Related Dataset</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the URL/DOI of the related Dataset.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2092,7 +2133,7 @@
                         it, please enter the types
                         and the actual numbers or codes.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2104,7 +2145,7 @@
                     <label>Title of Journal, Book or Event</label>
                     <input-type>onebox</input-type>
                     <hint>Include the name of related item like the journal name, book title or event name.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2116,7 +2157,7 @@
                     <label>Event/Conference Place</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the event location.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2128,7 +2169,7 @@
                     <label>Conference Date</label>
                     <input-type>date</input-type>
                     <hint>Enter the date of the event.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2140,7 +2181,7 @@
                     <label>Volume</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the volume of the item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2152,7 +2193,7 @@
                     <label>Issue</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the issue number of the item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2164,7 +2205,7 @@
                     <label>Edition</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the edition of the item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2176,7 +2217,7 @@
                     <label>First Page</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the start page number.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
                 <field>
                     <dc-schema>oaire</dc-schema>
@@ -2186,7 +2227,7 @@
                     <label>Last Page</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the last page number.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2212,7 +2253,7 @@
                     <input-type value-pairs-name="openaire_version_types">dropdown</input-type>
                     <hint>Select the version of the resource. If the resource does not have that information, please
                         select "Not Applicable (or Unknown)".</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -2225,7 +2266,7 @@
                         list, please select 'Other'. If the content does not really have a language (for example, if it
                         is a dataset or an image) please select 'N/A'.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -2241,7 +2282,7 @@
                     <label>Subject Keywords</label>
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
-                    <required></required>
+                    <required>true</required>
                     <vocabulary>srsc</vocabulary>
                 </field>
             </row>
@@ -2258,7 +2299,7 @@
                     <label>Subject Keywords (Fields of Science and Technology - OECD) </label>
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases based on the defined taxonomy.</hint>
-                    <required></required>
+                    <required>true</required>
                     <vocabulary>fos</vocabulary>
                 </field>
             </row> -->
@@ -2272,7 +2313,7 @@
                     <label>Abstract</label>
                     <input-type>textarea</input-type>
                     <hint>Enter the abstract of the item.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2289,7 +2330,7 @@
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
                     <externalsources>openaireFunding</externalsources>
-                    <required></required>
+                    <required>true</required>
                 </relation-field>
             </row>
             <row>
@@ -2301,7 +2342,7 @@
                     <label>Coverage</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the coverage of the item, like a period, jurisdiction, etc.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2313,7 +2354,7 @@
                     <label>Description</label>
                     <input-type>textarea</input-type>
                     <hint>Enter any other description or comments in this box.</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -2377,7 +2418,7 @@
                     <hint>If the author has any identifiers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
         </form>
@@ -2460,7 +2501,7 @@
                     <hint>If the organization has any identifiers or codes associated with
                         it, please enter the types and the actual numbers or codes.
                     </hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -2470,7 +2511,7 @@
                     <label>Organization type</label>
                     <input-type value-pairs-name="openaire_organization_types">dropdown</input-type>
                     <hint>Choose the attributes of the Organization</hint>
-                    <required></required>
+                    <required>true</required>
                 </field>
             </row>
             <row>
@@ -5201,6 +5242,100 @@
 			</pair>
 		</value-pairs>
 
+		<value-pairs value-pairs-name="common_audience" dc-term="audience">
+			<pair>
+				<displayed-value>Administrators</displayed-value>
+				<stored-value>Administrators</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Agricultura Producers</displayed-value>
+				<stored-value>Agricultura Producers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Community Groups</displayed-value>
+				<stored-value>Community Groups</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Counsellors</displayed-value>
+				<stored-value>Counsellors</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Federal Funds Recipients and Applicants</displayed-value>
+				<stored-value>Federal Funds Recipients and Applicants</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>General Public</displayed-value>
+				<stored-value>General Public</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Librarians</displayed-value>
+				<stored-value>Librarians</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Municipal Government</displayed-value>
+				<stored-value>Municipal Government</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>News Media</displayed-value>
+				<stored-value>News Media</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Other</displayed-value>
+				<stored-value>Other</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Parents and Families</displayed-value>
+				<stored-value>Parents and Families</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Policymakers</displayed-value>
+				<stored-value>Policymakers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Researchers</displayed-value>
+				<stored-value>Researchers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Rural Agirultural Organizations</displayed-value>
+				<stored-value>Rural Agirultural Organizations</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>School Support Staff</displayed-value>
+				<stored-value>School Support Staff</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Student Financial Aid Providers</displayed-value>
+				<stored-value>Student Financial Aid Providers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Students</displayed-value>
+				<stored-value>Students</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Teachers</displayed-value>
+				<stored-value>Teachers</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Institucional</displayed-value>
+				<stored-value>Institucional</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Regional Office</displayed-value>
+				<stored-value>Regional Office</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Institucional Units</displayed-value>
+				<stored-value>Institucional Units</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Programs</displayed-value>
+				<stored-value>Programs</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Projects</displayed-value>
+				<stored-value>Projects</stored-value>
+			</pair>
+		</value-pairs>
     </form-value-pairs>
 
 </input-forms>

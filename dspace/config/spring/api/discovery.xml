@@ -188,6 +188,11 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterUnit" />
+                <ref bean="searchFilterClient" />
+                <ref bean="searchFilterStatus" />
+                <ref bean="searchFilterProgram" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
             </list>
@@ -201,6 +206,11 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterUnit" />
+                <ref bean="searchFilterClient" />
+                <ref bean="searchFilterStatus" />
+                <ref bean="searchFilterProgram" />
+                <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
@@ -2557,8 +2567,16 @@
         <property name="indexFieldName" value="author"/>
         <property name="metadataFields">
             <list>
-                <value>dc.contributor.author</value>
-                <value>dc.creator</value>
+            	<value>dc.creator</value>
+            	<value>dc.contributor.author</value>
+            	<value>dc.creator.coorporative</value>
+            	<value>dc.contributor.designer</value>
+            	<value>dc.contributor.editor</value>
+            	<value>dc.contributor.ilustrator</value>
+            	<value>dc.contributor.partnership</value>
+            	<value>dc.contributor.photographer</value>
+            	<value>dc.creator.photographer</value>
+                <value>dc.contributor.translator</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -2587,14 +2605,17 @@
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
-                <value>dc.subject.*</value>
+                <value>dc.subject.agrovoc</value>
+                <value>dc.subject.keywords</value>
+                <value>dc.subject.program</value>
+                <value>dc.subject.project</value>
+				<value>dc.subject.cimmyt</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="splitter" value="::"/>
-
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
@@ -2659,6 +2680,57 @@
             </list>
         </property>
     </bean>
+<!-- Digital Assets search filters -->
+    <bean id="searchFilterUnit" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="unit" />
+        <property name="metadataFields">
+            <list>
+                <value>cimmyt.unit</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+    </bean>
+
+    <bean id="searchFilterClient" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="client" />
+        <property name="metadataFields">
+            <list>
+                <value>cimmyt.client</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+    </bean>
+
+    <bean id="searchFilterStatus" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="status" />
+        <property name="metadataFields">
+            <list>
+                <value>cimmyt.status</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+    </bean>
+
+    <bean id="searchFilterProgram" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="program" />
+        <property name="metadataFields">
+            <list>
+                <value>cimmyt.program</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+    </bean>
+
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="language"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.language</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+    </bean>
+<!-- Digital Assets search filters -->
 
     <bean id="searchFilterObjectType"
         class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
