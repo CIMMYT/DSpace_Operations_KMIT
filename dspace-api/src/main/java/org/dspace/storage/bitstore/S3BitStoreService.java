@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -38,6 +40,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.model.UploadPartRequest;
 import com.amazonaws.services.s3.model.UploadPartResult;
 import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
@@ -207,6 +210,13 @@ public class S3BitStoreService extends BaseBitStoreService {
             return;
         }
 
+        
+        ClientConfiguration clientConfig = new ClientConfiguration();
+        clientConfig.setMaxConnections(10);
+        clientConfig.setMaxErrorRetry(2);
+        clientConfig.setConnectionTimeout(10_000);
+        clientConfig.setSocketTimeout(60_000);
+
         try {
             if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
                 log.warn("Use local defined S3 credentials");
@@ -223,11 +233,13 @@ public class S3BitStoreService extends BaseBitStoreService {
                 // init client
                 if (StringUtils.isNotBlank(getAwsEndPoint())){
                     s3Service = FunctionalUtils.getDefaultOrBuild(
-                            this.s3Service,
-                            amazonClientBuilderBy(
-                                    new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey()),
-                                    new AwsClientBuilder.EndpointConfiguration(getAwsEndPoint(), null)
-                                    )
+                                this.s3Service,
+                                () -> AmazonS3ClientBuilder.standard()
+                                        .withCredentials(new AWSStaticCredentialsProvider(
+                                                new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())))
+                                        .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(getAwsEndPoint(), null))
+                                        .withClientConfiguration(clientConfig)
+                                        .build()
                             );
                     log.warn("S3 Custom EndPoint set to: " + getAwsEndPoint());
                 } else {
@@ -273,9 +285,12 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
 
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+
         tm = FunctionalUtils.getDefaultOrBuild(tm, () -> TransferManagerBuilder.standard()
                                                                .withAlwaysCalculateMultipartMd5(true)
                                                                .withS3Client(s3Service)
+                                                               .withExecutorFactory(() -> executor)
                                                                .build());
     }
 
@@ -484,7 +499,6 @@ public class S3BitStoreService extends BaseBitStoreService {
             throw new IOException(e);
         }
     }
-
     /**
      * Utility Method: Prefix the key with a subfolder, if this instance assets are stored within subfolder
      *
@@ -511,7 +525,6 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         return bufFilename.toString();
     }
-
     /**
      * there are 2 cases:
      * - conventional bitstream, conventional storage
