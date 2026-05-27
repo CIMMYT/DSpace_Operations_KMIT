@@ -58,7 +58,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
 
@@ -75,7 +75,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isPhotographerOfPublicationMap -->
@@ -93,7 +93,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isProductorOfPublicationMap -->
@@ -111,7 +111,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isEditorOfPublicationMap -->
@@ -129,7 +129,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isIllustratorOfPublicationMap -->
@@ -147,7 +147,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isOtherContributorOfPublicationMap -->
@@ -165,7 +165,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isWriterContributorOfPublicationMap -->
@@ -183,7 +183,7 @@
             </util:list>
         </property>
         <property name="useForPlace" value="true"/>
-        <property name="populateWithNameVariant" value="true"/>
+        <property name="populateWithNameVariant" value="false"/>
     </bean>
 
     <!-- isTranslatorOfPublicationMap -->

@@ -165,6 +165,7 @@
                 <ref bean="searchFilterAgrovoc" />
                 <ref bean="searchFilterKeywords" />
                 <ref bean="searchFilterRegion" />
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterCountry" />
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />
@@ -188,10 +189,12 @@
                 <ref bean="searchFilterRegion"/>
                 <ref bean="searchFilterCountry" />
                 <ref bean="searchFilterIsPartOfSeries"/>
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />
                 <ref bean="searchFilterActionArea" />
                 <ref bean="searchFilterfunderName" />
+                <ref bean="searchFilterToCGSpace" />
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
                 <ref bean="searchFilterEntityType"/>
@@ -320,6 +323,7 @@
                 <ref bean="searchFilterKeywords" />
                 <ref bean="searchFilterRegion" />
                 <ref bean="searchFilterCountry" />
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />
                 <ref bean="searchFilterActionArea" />
@@ -341,6 +345,7 @@
                 <ref bean="searchFilterRegion"/>
                 <ref bean="searchFilterCountry" />
                 <ref bean="searchFilterIsPartOfSeries"/>
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />
                 <ref bean="searchFilterActionArea" />
@@ -1118,6 +1123,7 @@
                 <ref bean="searchFilterKeywords" />
                 <ref bean="searchFilterRegion" />
                 <ref bean="searchFilterCountry" />
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />
                 <ref bean="searchFilterActionArea" />
@@ -1139,6 +1145,7 @@
                 <ref bean="searchFilterRegion"/>
                 <ref bean="searchFilterCountry" />
                 <ref bean="searchFilterIsPartOfSeries"/>
+                <ref bean="searchFilterProgramAccelerator"/>
                 <ref bean="searchFilterInitiative" />
                 <ref bean="searchFilterImpactArea" />                
                 <ref bean="searchFilterActionArea" />
@@ -2490,7 +2497,19 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
- <!-- CGIAR inititive --> 
+ <!-- CGIAR inititive -->
+    
+    <bean id="searchFilterProgramAccelerator" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ProgramOrAccelerator"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.programAccelerator</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
 
     <bean id="searchFilterInitiative" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="initiative"/>
@@ -2540,6 +2559,20 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
  <!-- CGIAR inititive --> 
+
+<!-- To CGSpace -->
+    <bean id="searchFilterToCGSpace" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ToCGSpace"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.cgspacestatus</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+<!-- To CGSpace -->
     
     <bean id="searchFilterIdentifier" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="itemidentifier" />

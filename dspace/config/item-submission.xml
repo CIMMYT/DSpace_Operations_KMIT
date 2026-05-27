@@ -24,7 +24,7 @@
         <name-map collection-handle="10883/4048" submission-name="photo"/>
         <name-map collection-handle="10883/19654" submission-name="sas_latam"/>
 
-        <name-map collection-handle="10883/22490" submission-name="Person"/>
+        <name-map collection-handle="10883/23173" submission-name="Person"/>
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -370,7 +370,6 @@
         <submission-process name="Person">
             <step id="collection"/>
             <step id="personStep"/>
-            <step id="upload"/>
             <!-- <step id="license"/> -->
         </submission-process>
 

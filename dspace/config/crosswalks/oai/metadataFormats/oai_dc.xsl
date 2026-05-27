@@ -61,7 +61,11 @@
 			</xsl:for-each>
 			<!-- dc.type -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
-				<dc:type><xsl:value-of select="." /></dc:type>
+				    <dc:type>
+						<xsl:call-template name="mapResourceType">
+							<xsl:with-param name="value" select="." />
+						</xsl:call-template>
+					</dc:type>
 			</xsl:for-each>
 			<!-- dc.type.* -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:element/doc:field[@name='value']">
@@ -137,4 +141,68 @@
 			</xsl:for-each>
 		</oai_dc:dc>
 	</xsl:template>
+
+
+	<xsl:template name="mapResourceType">
+		<xsl:param name="value" />
+
+		<!-- Normalización -->
+		<xsl:variable name="v"
+			select="translate(normalize-space($value),
+			'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+			'abcdefghijklmnopqrstuvwxyz')" />
+
+		<xsl:choose>
+
+			<!-- Article group -->
+			<xsl:when test="$v = 'article' or $v = 'review' or $v = 'preprint'">
+				<xsl:text>info:eu-repo/semantics/article</xsl:text>
+			</xsl:when>
+
+			<!-- Book -->
+			<xsl:when test="$v = 'book' or $v = 'handbook'">
+				<xsl:text>info:eu-repo/semantics/book</xsl:text>
+			</xsl:when>
+
+			<!-- Book Chapter -->
+			<xsl:when test="$v = 'book chapter'">
+				<xsl:text>info:eu-repo/semantics/bookPart</xsl:text>
+			</xsl:when>
+
+			<!-- Conference -->
+			<xsl:when test="
+				$v = 'conference paper' or
+				$v = 'conference poster' or
+				$v = 'conference proceedings' or
+				$v = 'presentation'">
+				<xsl:text>info:eu-repo/semantics/conferenceObject</xsl:text>
+			</xsl:when>
+
+			<!-- Working Paper -->
+			<xsl:when test="$v = 'working paper'">
+				<xsl:text>info:eu-repo/semantics/workingPaper</xsl:text>
+			</xsl:when>
+
+			<!-- Reports -->
+			<xsl:when test="
+				$v = 'report' or
+				$v = 'research report' or
+				$v = 'annual report' or
+				$v = 'financial report'">
+				<xsl:text>info:eu-repo/semantics/report</xsl:text>
+			</xsl:when>
+
+			<!-- Dataset -->
+			<xsl:when test="$v = 'dataset'">
+				<xsl:text>info:eu-repo/semantics/dataset</xsl:text>
+			</xsl:when>
+
+			<!-- Default -->
+			<xsl:otherwise>
+				<xsl:text>info:eu-repo/semantics/other</xsl:text>
+			</xsl:otherwise>
+
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>
