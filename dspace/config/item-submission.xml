@@ -319,6 +319,7 @@
             <step id="standarCIMMYT_p1"/>
             <step id="cgiar_initiatives_form"/>
             <step id="upload"/>
+            <step id="cclicense"/>
             <!-- <step id="license"/> -->
         </submission-process>
 
@@ -344,6 +345,7 @@
             <step id="sas_latam_p1"/>
             <step id="cgiar_initiatives_form"/>
             <step id="upload"/>
+            <step id="cclicense"/>
             <!-- <step id="license"/> -->
         </submission-process>
         <!-- CIMMYT -->
