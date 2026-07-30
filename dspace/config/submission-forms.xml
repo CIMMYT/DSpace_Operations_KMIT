@@ -394,7 +394,6 @@
                     <search-configuration>publication</search-configuration>
                     <label>Publication</label>
                     <hint>import a publicaton</hint>
-                    <externalsources>pubmed</externalsources>
                 </relation-field>
             </row>
             <row>
@@ -424,35 +423,6 @@
                     <hint>Enter the email of the person</hint>
                 </field>
             </row>
-            <!--     <row>-->
-            <!--     <field>-->
-            <!--       <dc-schema>person</dc-schema>-->
-            <!--       <dc-element>identifier</dc-element>-->
-            <!--       <dc-qualifier>orcid</dc-qualifier>-->
-            <!--       <label>Orcid</label>-->
-            <!--       <input-type>onebox</input-type>-->
-            <!--       <hint>Enter the orcid of the person</hint>-->
-            <!--     </field>-->
-            <!--     </row>-->
-            <row>
-                <field>
-                    <dc-schema>person</dc-schema>
-                    <dc-element>birthDate</dc-element>
-                    <label>Birth date</label>
-                    <input-type>date</input-type>
-                    <hint>Enter the birth date of the person</hint>
-                </field>
-            </row>
-<!--            <row>-->
-<!--                <field>-->
-<!--                    <dc-schema>person</dc-schema>-->
-<!--                    <dc-element>identifier</dc-element>-->
-<!--                    <dc-qualifier>staffid</dc-qualifier>-->
-<!--                    <label>Staff ID</label>-->
-<!--                    <input-type>onebox</input-type>-->
-<!--                    <hint>Enter the staff id of the person</hint>-->
-<!--                </field>-->
-<!--            </row>-->
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
@@ -460,6 +430,48 @@
                     <label>Job title</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the job title of the person</hint>
+                    <repeatable>true</repeatable>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>person</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>orcid</dc-qualifier>
+                    <label>ORCID</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the orcid of the person</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>person</dc-schema>
+                    <dc-element>name</dc-element>
+                    <dc-qualifier>variant</dc-qualifier>
+                    <label>Variant name</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the last name of the person</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>person</dc-schema>
+                    <dc-element>alternateName</dc-element>
+                    <label>Alternative name</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the last name of the person</hint>
+                    <repeatable>true</repeatable>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>person</dc-schema>
+                    <dc-element>affiliation</dc-element>
+                    <dc-qualifier>name</dc-qualifier>
+                    <label>Affiliation</label>
+                    <input-type>onebox</input-type>
+                    <hint>Centro Internacional de Mejoramiento de Maíz y Trigo (CIMMYT)</hint>
+                    <repeatable>true</repeatable>
                 </field>
             </row>
         </form>
@@ -1325,6 +1337,1183 @@
             </row>
         </form>
 
+    <!-- _____________________________________________________________________ -->
+    <!--                     CIMMYT Forms definitions                          -->
+    <!-- _____________________________________________________________________ -->
+
+                <!-- Form author: Jesús Herrera-->
+            <!-- Date created: October 30, 2014-->
+            <!-- Date modified: January 23, 2015-->
+            <!-- Date modified: August 29, 2019 by Alejandra Tenorio-->
+            <!-- Date modified: September 11, 2019 by Alejandra Tenorio-->
+            <!-- Date modified: July 30, 2026 by Gerardo Flores (Refactorized)-->
+            <!-- Please share your name when make changes to this forms -->
+   
+        <form name="CIMMYTStandardStepOne">
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>audience</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Audience</label>
+                    <input-type value-pairs-name="common_audience_cimmyt">dropdown</input-type>
+                    <hint/>
+                    <required>Required: Please select a proper audience</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Format</label>
+                    <input-type value-pairs-name="common_format_open_aire">dropdown</input-type>
+                    <hint>The physical or digital manifestation of the resource</hint>
+                    <required>Required: Please select a proper format</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>License</label>
+                    <input-type value-pairs-name="publication_licensing">dropdown</input-type>
+                    <required>Required: Please select a proper license</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>other</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Other</label>
+                    <input-type value-pairs-name="common_area_conocimiento_conacyt">dropdown</input-type>
+                    <hint/>
+                    <required>Required: Please select a proper Other</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>publicationversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publication Version</label>
+                    <input-type value-pairs-name="common_version_open_aire">dropdown</input-type>
+                    <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+                    <required>Required: Please select a proper type</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_languages_open_aire">dropdown</input-type>
+                    <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'None'.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>corporate</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Corporate author</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row>
+                    <relation-field>
+                        <relationship-type>isAuthorOfPublication</relationship-type>
+                        <search-configuration>person</search-configuration>
+                        <repeatable>true</repeatable>
+                        <label>Author</label>
+                        <hint>Enter the author's name (Family name, Given names).</hint>
+                        <linked-metadata-field>
+                            <dc-schema>dc</dc-schema>
+                            <dc-element>creator</dc-element>
+                            <dc-qualifier/>
+                            <input-type>onebox</input-type>
+                        </linked-metadata-field>
+                        <required></required>
+                    </relation-field>
+                </row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Source</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>elocator</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Elocator</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>isbn</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Source ISBN</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>issn</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Source ISSN</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Relation</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>designer</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Designer</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>editor</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Editor</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>illustrator</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Illustrator</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>other</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Other contributors</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>partnership</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Partnership</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>photographer</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Photographer</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>translator</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Translator</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Issued</label>
+                    <input-type>onebox</input-type>
+                    <hint>Please type year of previous publication or public distribution below.</hint>
+                    <required>Please type year of previous publication or public distribution below.</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Title Alternative</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required>Enter the main title of the item.</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Description</label>
+                    <input-type>textarea</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>isbn</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>ISBN</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dcterms</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Koha Identifier</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>agrovoc</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>AGROVOC descriptors</label>
+                    <input-type>onebox</input-type>
+                    <hint>Select the AGROVOC description related to this publication http://aims.fao.org/standards/agrovoc/functionalities/search</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>dataset</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Related dataset</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+
+                <!-- CGIAR initiative -->
+
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>impactArea</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>CGIAR Impact Area</label>
+                    <input-type value-pairs-name="cgiar_impact_areas">dropdown</input-type>
+                    <hint/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>CGIARinitiative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>CGIAR Initiative</label>
+                    <input-type value-pairs-name="cgiar_initiatives">dropdown</input-type>
+                    <hint/>
+                </field></row>              
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>actionArea</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>CGIAR Action Area</label>
+                    <input-type value-pairs-name="cgiar_action_areas">dropdown</input-type>
+                    <hint/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>cgspaceuri</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>CGSpace Handle</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                </field></row>          
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>funderName</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Donor or Funder</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                </field></row>
+        </form>
+
+        <form name="cgiarInitiativesStep">
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>impactArea</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>CGIAR Impact Area</label>
+                <input-type value-pairs-name="cgiar_impact_areas">dropdown</input-type>
+                <hint/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>CGIARinitiative</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>CGIAR Initiative</label>
+                <input-type value-pairs-name="cgiar_initiatives">dropdown</input-type>
+                <hint/>
+            </field></row>              
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>actionArea</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>CGIAR Action Area</label>
+                <input-type value-pairs-name="cgiar_action_areas">dropdown</input-type>
+                <hint/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>cgspaceuri</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>CGSpace Handle</label>
+                <input-type>onebox</input-type>
+                <hint/>
+            </field></row>          
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>funderName</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Donor or Funder</label>
+                <input-type>onebox</input-type>
+                <hint/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>programAccelerator</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Program or Accelerator</label>
+                <input-type value-pairs-name="cgiar_program_accelerators">dropdown</input-type>
+                <hint/>
+            </field></row>
+        </form>
+
+        <form name="CIMMYTVideoStepOne">
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <repeatable>false</repeatable>
+                <label> Title</label>
+                <input-type>onebox</input-type>
+                <hint>Example: "Norman Borlaug receiving the Nobel Prize"</hint>
+                <required>Required: Please provide content for this field</required>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier>alternative</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Alternative Title</label>
+                <input-type>onebox</input-type>
+                <hint/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier>corporate</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Corporate author</label>
+                <input-type>name</input-type>
+                <hint>Example: "Centro Internacional de Mejoramiento de Maíz y Trigo (CIMMYT)"</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Publication date</label>
+                <input-type>date</input-type>
+                <hint>Please input the year in which the item was first published.</hint>
+                <required>Required: Please input the year in which the item was first published.</required>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>coverage</dc-element>
+                <dc-qualifier>place</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Place of Publisher</label>
+                <input-type>onebox</input-type>
+                <hint>Example: El Batan, Texcoco, Mexico / Example: Ciudad Obregon, Sonora, Mexico / Example: Lerma, Toluca, Mexico</hint>
+                <required>This value is mandatory</required>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>coverage</dc-element>
+                <dc-qualifier/>
+                <repeatable>true</repeatable>
+                <label>Geographical Area of Focus</label>
+                <input-type>onebox</input-type>
+                <hint>Example: Río Frío / Example: Puebla / Example: Mexico / Example: Odisha / Example: India</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>coverage</dc-element>
+                <dc-qualifier>spatial</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Coverage (time period)</label>
+                <input-type>onebox</input-type>
+                <hint>Example: Green Revolution</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>contributor</dc-element>
+                <dc-qualifier>narrator</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Narrator</label>
+                <input-type>name</input-type>
+                <hint>Example: "Turner, H."</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>contributor</dc-element>
+                <dc-qualifier>writer</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Writer</label>
+                <input-type>name</input-type>
+                <hint>Example: "Turner, H."</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>contributor</dc-element>
+                <dc-qualifier>photographer</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Photographer</label>
+                <input-type>name</input-type>
+                <hint>Example: "Iftikar, W."</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>contributor</dc-element>
+                <dc-qualifier>editor</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Editor</label>
+                <input-type>name</input-type>
+                <hint>Example: "Iftikar, W."</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier>sponsor</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Sponsor</label>
+                <input-type>onebox</input-type>
+                <hint>Example: USAID / Example: SAGARPA</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>language</dc-element>
+                <dc-qualifier/>
+                <repeatable>true</repeatable>
+                <label>Language</label>
+                <input-type value-pairs-name="common_iso_languages_video">dropdown</input-type>
+                <hint>Example: Spanish / Example: Urdu</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>language</dc-element>
+                <dc-qualifier>subtitles</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Subtitles</label>
+                <input-type value-pairs-name="common_iso_languages_video">dropdown</input-type>
+                <hint>Example: English / Example: Spanish</hint>
+                <required/>
+            </field></row>
+        </form>
+
+        <form name="CIMMYTVideoStepTwo">
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier>duration</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Duration</label>
+                <input-type>onebox</input-type>
+                <hint>Video duration in hour, minute and second format (HH: MM: SS). Example: 20:15 (HH:MM:SS) / 01:30:25 (HH:MM:SS)</hint>
+                <required>Required</required>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>format</dc-element>
+                <dc-qualifier/>
+                <repeatable>false</repeatable>
+                <label>Format</label>
+                <input-type value-pairs-name="video_type_updated">dropdown</input-type>
+                <hint>Example: MP4 / MPEG</hint>
+                <required>Required: Please select a proper format</required>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier/>
+                <repeatable>false</repeatable>
+                <label>Description or Resumen</label>
+                <input-type>textarea</input-type>
+                <hint>Please provide a brief description of the content uploaded. Example: Meeting about wheat in Mexico, celebrated at Chapingo University in 1975.</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier>personages</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Personages</label>
+                <input-type>onebox</input-type>
+                <hint>Example Norman E. Borlaug. / Example: Donald L. Winklemann</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier>physical</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Physical Description</label>
+                <input-type>onebox</input-type>
+                <hint>Example: White and Black Example Color Photograph.</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>description</dc-element>
+                <dc-qualifier>notes</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Notes</label>
+                <input-type>textarea</input-type>
+                <hint>Example: This film contains three videos. / Example: Analogic video with format U-matic small.</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier/>
+                <repeatable>false</repeatable>
+                <label>Relation</label>
+                <input-type>onebox</input-type>
+                <hint>Example: https://www.flickr.com/photos/cimmyt/48181208646/</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartofseries</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Series</label>
+                <input-type>onebox</input-type>
+                <hint>Example: CIMMYT Monthly Photo Contest / Example: Celebration of 50 years of CIMMYT</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartofsubseries</dc-qualifier>
+                <repeatable>false</repeatable>
+                <label>Sub-series</label>
+                <input-type>onebox</input-type>
+                <hint>Example: How we eat maize and wheat</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>subject</dc-element>
+                <dc-qualifier>agrovoc</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Agrovoc</label>
+                <input-type>onebox</input-type>
+                <hint>Select the AGROVOC description related to this publication http://aims.fao.org/standards/agrovoc/functionalities/search</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>subject</dc-element>
+                <dc-qualifier>keywords</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Keywords</label>
+                <input-type>onebox</input-type>
+                <hint>Example: Children. / Example: Woman. / Example: Food</hint>
+                <required/>
+            </field></row>
+            <row><field>
+                <dc-schema>dc</dc-schema>
+                <dc-element>subject</dc-element>
+                <dc-qualifier>tags</dc-qualifier>
+                <repeatable>true</repeatable>
+                <label>Tags</label>
+                <input-type>onebox</input-type>
+                <hint>Example: Woman giving popcorn / Example: Children in the street / Example: Rural community</hint>
+                <required/>
+            </field></row>
+        </form>
+
+        <form name="CIMMYTPhotoStepOne">
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: Homemade popcorn: attractive and nutritious</hint>
+                    <required>Required: Please provide content for this field</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Alternative title</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has any alternative titles, please enter them below. Example: Palomitas de maíz caseras: atractivas y nutritivas</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Geographical area of focus</label>
+                    <input-type>onebox</input-type>
+                    <hint>Where was this photo taken? Example: Río Frío / Example: Puebla / Example: Mexico / Example: Odisha / Example: India</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Coverage (time period)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: Green Revolution</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>corporate</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Corporate author</label>
+                    <input-type>name</input-type>
+                    <hint>Example: Centro Internacional de Mejoramiento de Maíz y Trigo(CIMMYT)</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>photographer</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Photographer</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the name of the photographer is shown with name and last name, please write the surname first and the initial of the first name, separated by a comma. Example: if the name is presented as "Wasim Iftikhar", use the form "Iftikhar, W."</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publication date</label>
+                    <input-type>date</input-type>
+                    <hint>Please input the year in which this photo was taken. Example: 2018</hint>
+                    <required>Required</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Description</label>
+                    <input-type>textarea</input-type>
+                    <hint>Please provide a brief description of the content uploaded. Example: Meeting about wheat in Mexico, celebrated at Chapingo University in 1975.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>size</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Format size</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: 4"x6"</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>notes</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Notes</label>
+                    <input-type>textarea</input-type>
+                    <hint>Example: Photo damaged</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>physical</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Physical Description</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: White and Black / Example: Color Photograph</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>personages</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Personages</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example Norman E. Borlaug / Example: Donald L. Winklemann</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Format</label>
+                    <input-type value-pairs-name="common_photo_format_open_aire">dropdown</input-type>
+                    <hint>Example: JPEG</hint>
+                    <required>Required: Please select a proper format</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>place</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Place of Publication</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: El Batan, Texcoco, Mexico / Example: Ciudad Obregon, Sonora, Mexico / Example: Lerma, Toluca, Mexico</hint>
+                    <required>Required</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Relation</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: https://www.flickr.com/photos/cimmyt/48181208646/</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Series</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: CIMMYT Monthly Photo Contest / Example: Celebration of 50 years of CIMMYT</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>subseries</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sub-series </label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: How we eat maize and wheat</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>keywords</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Keywords</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: Children / Example: Woman / Example: Food</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>tags</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tags</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: Woman giving popcorn / Example: Children in the street / Example: Rural community</hint>
+                    <required/>
+                </field></row>
+
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>agrovoc</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Agrovoc</label>
+                    <input-type>onebox</input-type>
+                    <hint>Example: POPCORN</hint>
+                    <required/>
+                </field></row>
+        </form>
+
+        <form name="CIMMYTSASLatamStepOne">
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required>An entry is required</required>
+                </field></row>
+                <row>
+                    <relation-field>
+                        <relationship-type>isAuthorOfPublication</relationship-type>
+                        <search-configuration>person</search-configuration>
+                        <repeatable>true</repeatable>
+                        <label>Author</label>
+                        <hint>Enter the author's name (Family name, Given names).</hint>
+                        <linked-metadata-field>
+                            <dc-schema>dc</dc-schema>
+                            <dc-element>creator</dc-element>
+                            <dc-qualifier/>
+                            <input-type>onebox</input-type>
+                        </linked-metadata-field>
+                        <required></required>
+                    </relation-field>
+                </row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Contributor</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>editor</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Editor</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>illustrator</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Illustrator</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>other</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Other contributors</label>
+                    <input-type>name</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>regionoffocus</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Region of Focus</label>
+                    <input-type value-pairs-name="regions_list">dropdown</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Country of Focus</label>
+                    <input-type value-pairs-name="country_list">dropdown</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>other</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Place of Study</label>
+                    <input-type>onebox</input-type>
+                    <hint>Add information other information related to the place of study this document e.g. Oaxaca, Chiapas, Costa Sur, Altiplano.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Year of publication</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required>Year is required</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Description or abstract</label>
+                    <input-type>textarea</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>agrovoc</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>AGROVOC descriptors</label>
+                    <input-type>onebox</input-type>
+                    <hint>Select the AGROVOC description related to this publication http://aims.fao.org/standards/agrovoc/functionalities/search</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>keywords</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Keywords</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>tags</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tags</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>audience</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>Audience</label>
+                    <input-type value-pairs-name="common_audience_open_aire">dropdown</input-type>
+                    <hint/>
+                    <required>Required: Please select a proper audience</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>journal</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Journal</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>other</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Publisher</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required>An entry is required</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>pages</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Pages</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required>An entry is required</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>series</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Series</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>subseries</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sub-series </label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the sub-series and number assigned to this item by your community.</hint>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_languages_open_aire">dropdown</input-type>
+                    <hint>Select the language of the main content of the item. If the language does not appear in the list below, please select 'Other'. If the content does not really have a language (for example, if it is a dataset or an image) please select 'None'.</hint>
+                    <required>Required: Please select a proper language</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>program</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Program</label>
+                    <input-type value-pairs-name="program_list">dropdown</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>project</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Project</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>cgiar</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>CGIAR Research Program</label>
+                    <input-type value-pairs-name="cgiar_program_list">dropdown</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>hubs</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Hubs</label>
+                    <input-type value-pairs-name="hubs_list">dropdown</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Format</label>
+                    <input-type value-pairs-name="common_format_open_aire">dropdown</input-type>
+                    <hint>The physical or digital manifestation of the resource</hint>
+                    <required>Required: Please select a proper format</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>CIMMYT institutional type</label>
+                    <input-type value-pairs-name="common_types_open_aire">dropdown</input-type>
+                    <hint/>
+                    <required>Required: Please select a proper type</required>
+                </field></row>
+                <row><field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>isbn</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>ISBN</label>
+                    <input-type>onebox</input-type>
+                    <hint/>
+                    <required/>
+                </field></row>
+        </form>
+
+    <!-- _____________________________________________________________________ -->
+    <!--                     CIMMYT Forms definitions                          -->
+    <!-- _____________________________________________________________________ -->
     </form-definitions>
 
 
@@ -1366,97 +2555,6 @@
             <pair>
                 <displayed-value>ISBN</displayed-value>
                 <stored-value>isbn</stored-value>
-            </pair>
-        </value-pairs>
-
-        <value-pairs value-pairs-name="common_types" dc-term="type">
-            <pair>
-                <displayed-value>Animation</displayed-value>
-                <stored-value>Animation</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Article</displayed-value>
-                <stored-value>Article</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Book</displayed-value>
-                <stored-value>Book</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Book chapter</displayed-value>
-                <stored-value>Book chapter</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Dataset</displayed-value>
-                <stored-value>Dataset</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Learning Object</displayed-value>
-                <stored-value>Learning Object</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Image</displayed-value>
-                <stored-value>Image</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Image, 3-D</displayed-value>
-                <stored-value>Image, 3-D</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Map</displayed-value>
-                <stored-value>Map</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Musical Score</displayed-value>
-                <stored-value>Musical Score</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Plan or blueprint</displayed-value>
-                <stored-value>Plan or blueprint</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Preprint</displayed-value>
-                <stored-value>Preprint</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Presentation</displayed-value>
-                <stored-value>Presentation</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Recording, acoustical</displayed-value>
-                <stored-value>Recording, acoustical</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Recording, musical</displayed-value>
-                <stored-value>Recording, musical</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Recording, oral</displayed-value>
-                <stored-value>Recording, oral</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Software</displayed-value>
-                <stored-value>Software</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Technical Report</displayed-value>
-                <stored-value>Technical Report</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Thesis</displayed-value>
-                <stored-value>Thesis</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Video</displayed-value>
-                <stored-value>Video</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Working Paper</displayed-value>
-                <stored-value>Working Paper</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Other</displayed-value>
-                <stored-value>Other</stored-value>
             </pair>
         </value-pairs>
 
@@ -1963,6 +3061,1005 @@
             </pair>
         </value-pairs>
 
-    </form-value-pairs>
+        
+    <!-- _____________________________________________________________________ -->
+    <!--                     CIMMYT Value Pairs                                -->
+    <!-- _____________________________________________________________________ -->
+    
+        <value-pairs value-pairs-name="common_audience_cimmyt" dc-term="audience_type">
+            <pair>
+                <displayed-value>Administrators</displayed-value>
+                <stored-value>Administrators</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Beneficiaries of funds federal and applicants</displayed-value>
+                <stored-value>Beneficiaries of funds federal and applicants</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Librarians</displayed-value>
+                <stored-value>Librarians</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Counsellors</displayed-value>
+                <stored-value>Counsellors</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Companies</displayed-value>
+                <stored-value>Companies</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Students</displayed-value>
+                <stored-value>Students</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Community Groups</displayed-value>
+                <stored-value>Community Groups</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Researchers</displayed-value>
+                <stored-value>Researchers</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Teachers</displayed-value>
+                <stored-value>Teachers</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>News Media</displayed-value>
+                <stored-value>News Media</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Parents and Families</displayed-value>
+                <stored-value>Parents and Families</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>School Support Staff</displayed-value>
+                <stored-value>School Support Staff</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Legislators</displayed-value>
+                <stored-value>Legislators</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Student Financial Aid Providers</displayed-value>
+                <stored-value>Student Financial Aid Providers</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>General public</displayed-value>
+                <stored-value>General public</stored-value>
+            </pair>
 
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_format_open_aire" dc-term="format_type">
+            <pair>
+                <displayed-value>PDF</displayed-value>
+                <stored-value>pdf</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Unknown</displayed-value>
+                <stored-value>unknown</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>XML</displayed-value>
+                <stored-value>xml</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Text</displayed-value>
+                <stored-value>txt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>HTML</displayed-value>
+                <stored-value>html</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>CSS</displayed-value>
+                <stored-value>css</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Word</displayed-value>
+                <stored-value>doc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Word XML</displayed-value>
+                <stored-value>docx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Powerpoint</displayed-value>
+                <stored-value>ppt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Powerpoint XML</displayed-value>
+                <stored-value>pptx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Excel</displayed-value>
+                <stored-value>xls</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Excel XML</displayed-value>
+                <stored-value>xlsx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>MARC</displayed-value>
+                <stored-value>marc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>JPEG</displayed-value>
+                <stored-value>jpeg</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>GIF</displayed-value>
+                <stored-value>gif</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>PNG</displayed-value>
+                <stored-value>png</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="publication_licensing" dc-term="rights">
+            <pair>
+                <displayed-value>CIMMYT Terms of Use</displayed-value>
+                <stored-value>CIMMYT manages Intellectual Assets as International Public Goods. The user is free to download, print, store and share this work. In case you want to translate or create any other derivative work and share or distribute such translation/derivative work, please contact CIMMYT-Knowledge-Center@cgiar.org indicating the work you want to use and the kind of use you intend; CIMMYT will contact you with the suitable license for that purpose.</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_area_conocimiento_conacyt" dc-term="area_conacyt_type">
+            <pair>
+                <displayed-value/>
+                <stored-value/>
+            </pair>
+            <pair>
+                <displayed-value>BIOLOGY AND CHEMISTRY</displayed-value>
+                <stored-value>BIOLOGY AND CHEMISTRY</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>AGRICULTURAL SCIENCES AND BIOTECHNOLOGY</displayed-value>
+                <stored-value>AGRICULTURAL SCIENCES AND BIOTECHNOLOGY</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>PHYSICAL-MATHEMATICS SCIENCES AND EARTH SCIENCES</displayed-value>
+                <stored-value>PHYSICAL-MATHEMATICS SCIENCES AND EARTH SCIENCES</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>SOCIAL SCIENCES</displayed-value>
+                <stored-value>SOCIAL SCIENCES</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>HUMANITIES AND BEHAVIOURAL SCIENCIES</displayed-value>
+                <stored-value>HUMANITIES AND BEHAVIOURAL SCIENCIES</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>INGENIEERING AND TECHNOLOGY</displayed-value>
+                <stored-value>INGENIEERING AND TECHNOLOGY</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>MEDICINE AND HEALTH SCIENCES</displayed-value>
+                <stored-value>MEDICINE AND HEALTH SCIENCES</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_version_open_aire" dc-term="version_type">
+            <pair>
+                <displayed-value>Published Version</displayed-value>
+                <stored-value>Published Version</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Draft</displayed-value>
+                <stored-value>Draft</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Submitted Version</displayed-value>
+                <stored-value>Submitted Version</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Accepted Version</displayed-value>
+                <stored-value>Accepted Version</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Updated Version</displayed-value>
+                <stored-value>Updated Version</stored-value>
+            </pair>     
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_languages_open_aire" dc-term="languages_type">
+            <pair>
+                <displayed-value>Spanish</displayed-value>
+                <stored-value>Spanish</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>English</displayed-value>
+                <stored-value>English</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>German</displayed-value>
+                <stored-value>German</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dutch</displayed-value>
+                <stored-value>Dutch</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Portuguese</displayed-value>
+                <stored-value>Portuguese</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Russian</displayed-value>
+                <stored-value>Russian</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>None</displayed-value>
+                <stored-value/>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_types" dc-term="type">
+            <pair>
+                <displayed-value>Academic Specialization</displayed-value>
+                <stored-value>Academic Specialization</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Annual Report</displayed-value>
+                <stored-value>Annual Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Article</displayed-value>
+                <stored-value>Article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bibliography</displayed-value>
+                <stored-value>Bibliography</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book Chapter</displayed-value>
+                <stored-value>Book Chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Brochure</displayed-value>
+                <stored-value>Brochure</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference Paper</displayed-value>
+                <stored-value>Conference Paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference Poster</displayed-value>
+                <stored-value>Conference Poster</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Conference Proceedings</displayed-value>
+                <stored-value>Conference Proceedings</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Contribution to Periodical</displayed-value>
+                <stored-value>Contribution to Periodical</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Directory</displayed-value>
+                <stored-value>Directory</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Graphic</displayed-value>
+                <stored-value>Graphic</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Handbook</displayed-value>
+                <stored-value>Handbook</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Newsletter / Bulletin</displayed-value>
+                <stored-value>Newsletter / Bulletin</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Photograph</displayed-value>
+                <stored-value>Photograph</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Preprint</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Presentation</displayed-value>
+                <stored-value>Presentation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Report</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Research Report</displayed-value>
+                <stored-value>Research Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Review</displayed-value>
+                <stored-value>Review</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Serial Publication</displayed-value>
+                <stored-value>Serial Publication</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Video</displayed-value>
+                <stored-value>Video</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Working Paper</displayed-value>
+                <stored-value>Working Paper</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- CGIAR -->
+
+        <value-pairs value-pairs-name="cgiar_impact_areas" dc-term="type">
+            <pair>
+                <displayed-value>Climate adaptation &amp; mitigation</displayed-value>
+                <stored-value>Climate adaptation &amp; mitigation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Environmental health &amp; biodiversity</displayed-value>
+                <stored-value>Environmental health &amp; biodiversity</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Gender equality, youth &amp; social inclusion</displayed-value>
+                <stored-value>Gender equality, youth &amp; social inclusion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Nutrition, health &amp; food security</displayed-value>
+                <stored-value>Nutrition, health &amp; food security</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Poverty reduction, livelihoods &amp; jobs</displayed-value>
+                <stored-value>Poverty reduction, livelihoods &amp; jobs</stored-value>
+            </pair>
+        </value-pairs>
+
+		<value-pairs value-pairs-name="cgiar_initiatives" dc-term="type">
+			<pair>
+				<displayed-value>Accelerated Breeding</displayed-value>
+				<stored-value>Accelerated Breeding</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>AgriLAC Resiliente</displayed-value>
+				<stored-value>AgriLAC Resiliente</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Agroecology</displayed-value>
+				<stored-value>Agroecology</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Aquatic Foods</displayed-value>
+				<stored-value>Aquatic Foods</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Asian Mega-Deltas</displayed-value>
+				<stored-value>Asian Mega-Deltas</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Breeding Resources</displayed-value>
+				<stored-value>Breeding Resources</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Climate Resilience</displayed-value>
+				<stored-value>Climate Resilience</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Digital Innovation</displayed-value>
+				<stored-value>Digital Innovation</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Diversification in East and Southern Africa</displayed-value>
+				<stored-value>Diversification in East and Southern Africa</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Excellence in Agronomy</displayed-value>
+				<stored-value>Excellence in Agronomy</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Foresight</displayed-value>
+				<stored-value>Foresight</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fragility to Resilience in Central and West Asia and North Africa</displayed-value>
+				<stored-value>Fragility to Resilience in Central and West Asia and North Africa</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fragility, Conflict, and Migration</displayed-value>
+				<stored-value>Fragility, Conflict, and Migration</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Fruit and Vegetables for Sustainable Healthy Diets</displayed-value>
+				<stored-value>Fruit and Vegetables for Sustainable Healthy Diets</stored-value>
+			</pair>
+            <pair>
+                    <displayed-value>Gender Equality</displayed-value>
+                    <stored-value>Gender Equality</stored-value>
+            </pair>
+			<pair>
+				<displayed-value>Genebanks</displayed-value>
+				<stored-value>Genebanks</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Genome Editing</displayed-value>
+				<stored-value>Genome Editing</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Livestock and Climate</displayed-value>
+				<stored-value>Livestock and Climate</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Low-Emission Food Systems Initiative</displayed-value>
+				<stored-value>Low-Emission Food Systems Initiative</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Market Intelligence</displayed-value>
+				<stored-value>Market Intelligence</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Mixed Farming Systems</displayed-value>
+				<stored-value>Mixed Farming Systems</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>National Policies and Strategies</displayed-value>
+				<stored-value>National Policies and Strategies</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Nature-Positive Solutions</displayed-value>
+				<stored-value>Nature-Positive Solutions</stored-value>
+			</pair>
+            <pair>
+                <displayed-value>NEXUS Gains</displayed-value>
+                <stored-value>NEXUS Gains</stored-value>
+            </pair>
+			<pair>
+				<displayed-value>One Health</displayed-value>
+				<stored-value>One Health</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Plant Health</displayed-value>
+				<stored-value>Plant Health</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Resilient Cities</displayed-value>
+				<stored-value>Resilient Cities</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Rethinking Food Markets</displayed-value>
+				<stored-value>Rethinking Food Markets</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Seed Equal</displayed-value>
+				<stored-value>Seed Equal</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sustainable Animal Productivity</displayed-value>
+				<stored-value>Sustainable Animal Productivity</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sustainable Healthy Diets</displayed-value>
+				<stored-value>Sustainable Healthy Diets</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Transforming Agrifood Systems in South Asia</displayed-value>
+				<stored-value>Transforming Agrifood Systems in South Asia</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>West and Central African Food Systems Transformation</displayed-value>
+				<stored-value>West and Central African Food Systems Transformation</stored-value>
+			</pair>
+		</value-pairs>
+
+        <value-pairs value-pairs-name="cgiar_action_areas" dc-term="type">
+            <pair>
+                <displayed-value>Genetic Innovation</displayed-value>
+                <stored-value>Genetic Innovation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Resilient Agrifood Systems</displayed-value>
+                <stored-value>Resilient Agrifood Systems</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Systems Transformation</displayed-value>
+                <stored-value>Systems Transformation</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="cgiar_program_accelerators" dc-term="programs">
+            <pair>
+                <displayed-value>Better Diets and Nutrition</displayed-value>
+                <stored-value>Better Diets and Nutrition</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Breeding for Tomorrow</displayed-value>
+                <stored-value>Breeding for Tomorrow</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Capacity Sharing</displayed-value>
+                <stored-value>Capacity Sharing</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Climate Action</displayed-value>
+                <stored-value>Climate Action</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Digital Transformation</displayed-value>
+                <stored-value>Digital Transformation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Food Frontiers and Security</displayed-value>
+                <stored-value>Food Frontiers and Security</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Gender Equality and Inclusion</displayed-value>
+                <stored-value>Gender Equality and Inclusion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Genebanks</displayed-value>
+                <stored-value>Genebanks</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Multifunctional Landscapes</displayed-value>
+                <stored-value>Multifunctional Landscapes</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Policy Innovations</displayed-value>
+                <stored-value>Policy Innovations</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Scaling for Impact</displayed-value>
+                <stored-value>Scaling for Impact</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Sustainable Animal and Aquatic Foods</displayed-value>
+                <stored-value>Sustainable Animal and Aquatic Foods</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Sustainable Farming</displayed-value>
+                <stored-value>Sustainable Farming</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- CGIAR  -->
+
+        <value-pairs value-pairs-name="common_iso_languages_video" dc-term="language_iso">
+            <pair>
+                <displayed-value/>
+                <stored-value/>
+            </pair>
+            <pair>
+                <displayed-value>None</displayed-value>
+                <stored-value>None</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>English</displayed-value>
+                <stored-value>English</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Spanish</displayed-value>
+                <stored-value>Spanish</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>German</displayed-value>
+                <stored-value>German</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>French</displayed-value>
+                <stored-value>French</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Italian</displayed-value>
+                <stored-value>Italian</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Japanese</displayed-value>
+                <stored-value>Japanese</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Chinese</displayed-value>
+                <stored-value>Chinese</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Urdu</displayed-value>
+                <stored-value>Urdu</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hindi</displayed-value>
+                <stored-value>Hindi</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bengali</displayed-value>
+                <stored-value>Bengali</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Amharic</displayed-value>
+                <stored-value>Amharic</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>(Other)</displayed-value>
+                <stored-value>(Other)</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="video_type_updated" dc-term="type">
+            <pair>
+                <displayed-value>MP4</displayed-value>
+                <stored-value>MP4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>MPEG</displayed-value>
+                <stored-value>MPEG</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_photo_format_open_aire" dc-term="format_type">
+            <pair>
+                <displayed-value>JPEG</displayed-value>
+                <stored-value>jpeg</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>GIF</displayed-value>
+                <stored-value>gif</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>PNG</displayed-value>
+                <stored-value>png</stored-value>
+            </pair>         
+            <pair>
+                <displayed-value>TIFF</displayed-value>
+                <stored-value>tiff</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>AIFF</displayed-value>
+                <stored-value>aiff</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- SAS -->
+
+        <value-pairs value-pairs-name="regions_list" dc-term="regions_list">
+            <pair>
+                <displayed-value>Central America</displayed-value>
+                <stored-value>Central America</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>South America</displayed-value>
+                <stored-value>South America</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>North America</displayed-value>
+                <stored-value>North America</stored-value>
+            </pair>
+        </value-pairs>
+
+		<value-pairs value-pairs-name="country_list" dc-term="country_list">
+            <pair>
+                <displayed-value>México</displayed-value>
+                <stored-value>México</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Guatemala</displayed-value>
+                <stored-value>Guatemala</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Colombia</displayed-value>
+                <stored-value>Colombia</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Haiti</displayed-value>
+                <stored-value>Haiti</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Honduras</displayed-value>
+                <stored-value>Honduras</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_audience_open_aire" dc-term="audience_type">
+            <pair>
+                <displayed-value>Municipal Government</displayed-value>
+                <stored-value>Municipal Government</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Researchers</displayed-value>
+                <stored-value>Researchers</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Community Groups</displayed-value>
+                <stored-value>Community Groups</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>General Public</displayed-value>
+                <stored-value>General Public</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Rural Agricultural Organizations</displayed-value>
+                <stored-value>Rural Agricultural Organizations</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Agricultural Producers</displayed-value>
+                <stored-value>Agricultural Producers</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Public Sector</displayed-value>
+                <stored-value>Public Sector</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Private Sector</displayed-value>
+                <stored-value>Private Sector</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Farm Advisor</displayed-value>
+                <stored-value>Farm Advisor</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_languages_open_aire" dc-term="languages_type">
+            <pair>
+                <displayed-value>Spanish</displayed-value>
+                <stored-value>Spanish</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>English</displayed-value>
+                <stored-value>English</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>German</displayed-value>
+                <stored-value>German</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dutch</displayed-value>
+                <stored-value>Dutch</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Portuguese</displayed-value>
+                <stored-value>Portuguese</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Russian</displayed-value>
+                <stored-value>Russian</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>None</displayed-value>
+                <stored-value/>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="program_list" dc-term="program_list">
+            <pair>
+                <displayed-value>Sustainable Agrifood Systems</displayed-value>
+                <stored-value>Sustainable Agrifood Systems</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Global Maize Program (GMP)</displayed-value>
+                <stored-value>Global Maize Program (GMP)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Global Wheat Program (GWP)</displayed-value>
+                <stored-value>Global Wheat Program (GWP)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Socioeconomics Program (SEP)</displayed-value>
+                <stored-value>Socioeconomics Program (SEP)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Genetic Resources Program (GRP)</displayed-value>
+                <stored-value>Genetic Resources Program (GRP)</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="cgiar_program_list" dc-term="cgiar_program_list">
+            <pair>
+                <displayed-value>Climate Change, Agriculture and Food Security (CCAFS)</displayed-value>
+                <stored-value>Climate Change, Agriculture and Food Security (CCAFS)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Research Program on Wheat (WHEAT)</displayed-value>
+                <stored-value>Research Program on Wheat (WHEAT)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>GENEBANK</displayed-value>
+                <stored-value>GENEBANK</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Policies, Institutions and Markets (PIM)</displayed-value>
+                <stored-value>Policies, Institutions and Markets (PIM)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Agriculture for Nutrition and Health (A4NH)</displayed-value>
+                <stored-value>Agriculture for Nutrition and Health (A4NH)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Platform BigData in Agriculture (BigData)</displayed-value>
+                <stored-value>Platform BigData in Agriculture (BigData)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Excellence in Breeding (EiB)</displayed-value>
+                <stored-value>Excellence in Breeding (EiB)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Research Program on Maize (MAIZE)</displayed-value>
+                <stored-value>Research Program on Maize (MAIZE)</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="hubs_list" dc-term="hubs_list">
+            <pair>
+                <displayed-value>Hub - Pacífico Sur</displayed-value>
+                <stored-value>Hub - Pacífico Sur</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Chiapas</displayed-value>
+                <stored-value>Hub - Chiapas</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Pacífico Centro</displayed-value>
+                <stored-value>Hub - Pacífico Centro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Yucatán</displayed-value>
+                <stored-value>Hub - Yucatán</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Golfo Centro</displayed-value>
+                <stored-value>Hub - Golfo Centro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Bajío</displayed-value>
+                <stored-value>Hub - Bajío</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Pacífico Norte</displayed-value>
+                <stored-value>Hub - Pacífico Norte</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Valles Altos Maíz</displayed-value>
+                <stored-value>Hub - Valles Altos Maíz</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Valles Altos Granos Pequeños</displayed-value>
+                <stored-value>Hub - Valles Altos Granos Pequeños</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Intermedio</displayed-value>
+                <stored-value>Hub - Intermedio</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Hub - Escala Intermedia</displayed-value>
+                <stored-value>Hub - Escala Intermedia</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_format_open_aire" dc-term="format_type">
+            <pair>
+                <displayed-value>PDF</displayed-value>
+                <stored-value>pdf</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Unknown</displayed-value>
+                <stored-value>unknown</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>XML</displayed-value>
+                <stored-value>xml</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Text</displayed-value>
+                <stored-value>txt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>HTML</displayed-value>
+                <stored-value>html</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>CSS</displayed-value>
+                <stored-value>css</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Word</displayed-value>
+                <stored-value>doc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Word XML</displayed-value>
+                <stored-value>docx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Powerpoint</displayed-value>
+                <stored-value>ppt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Powerpoint XML</displayed-value>
+                <stored-value>pptx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Excel</displayed-value>
+                <stored-value>xls</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Microsoft Excel XML</displayed-value>
+                <stored-value>xlsx</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>MARC</displayed-value>
+                <stored-value>marc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>JPEG</displayed-value>
+                <stored-value>jpeg</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>GIF</displayed-value>
+                <stored-value>gif</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>PNG</displayed-value>
+                <stored-value>png</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_types_open_aire" dc-term="publication_type">
+            <pair>
+                <displayed-value>Annual Report</displayed-value>
+                <stored-value>Annual Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book Chapter</displayed-value>
+                <stored-value>Book Chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Handbook</displayed-value>
+                <stored-value>Handbook</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Infographics</displayed-value>
+                <stored-value>Infographics</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Presentation</displayed-value>
+                <stored-value>Presentation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Report</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Serial Publication</displayed-value>
+                <stored-value>Serial Publication</stored-value>
+            </pair>
+        </value-pairs>
+    <!-- _____________________________________________________________________ -->
+    <!--                     CIMMYT Value Pairs                                -->
+    <!-- _____________________________________________________________________ --> 
+
+    </form-value-pairs>
 </input-forms>

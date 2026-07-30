@@ -18,7 +18,11 @@
     <!-- for handle "default". -->
     <submission-map>
         <!-- Default submission process -->
-        <name-map collection-handle="default" submission-name="traditional"/>
+        <!-- <name-map collection-handle="default" submission-name="traditional"/> -->
+        <name-map collection-handle="default" submission-name="CIMMYTStandard"/>
+        <name-map collection-handle="10883/4049" submission-name="CIMMYTVideo"/>
+        <name-map collection-handle="10883/4048" submission-name="CIMMYTPhoto"/>
+        <name-map collection-handle="10883/19654" submission-name="CIMMYTSASLatam"/>
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -56,13 +60,19 @@
             PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
             - - - - - -
         -->
-        <name-map collection-entity-type="Publication" submission-name="Publication"/>
+        <!-- <name-map collection-entity-type="Publication" submission-name="Publication"/> -->
         <name-map collection-entity-type="Person" submission-name="Person"/>
+        
+        <!--
+
         <name-map collection-entity-type="Project" submission-name="Project"/>
         <name-map collection-entity-type="OrgUnit" submission-name="OrgUnit"/>
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
+
+
+        -->
 
         <!-- Example of configuration using a community handle to map an Item Submission Process.
 
@@ -254,6 +264,48 @@
             <type>duplicates</type>
         </step-definition>
 
+        <!-- CIMMYT submission steps/forms -->
+
+        <step-definition id="CIMMYTStandardStepOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="cgiarInitiativesStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+
+        <step-definition id="CIMMYTVideoStepOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="CIMMYTVideoStepTwo" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="CIMMYTPhotoStepOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+         <step-definition id="CIMMYTSASLatamStepOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <!-- CIMMYT submission steps/forms -->
+
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -330,12 +382,6 @@
         Submission Process for 'Person' Entities
         To enable: create a collection for Persons and add it to the <submission-map> tag linking to this process
          -->
-        <submission-process name="Person">
-            <step id="collection"/>
-            <step id="personStep"/>
-            <step id="upload"/>
-            <step id="license"/>
-        </submission-process>
 
         <!--
         Submission Process for 'Pproject' Entities
@@ -423,6 +469,54 @@
             <step id="collection"/>
             <step id="openaireOrganizationForm"/>
         </submission-process>
+
+        <!-- ___________________________ -->
+        <!-- CIMMYT submission processes -->
+        <!-- ___________________________ -->
+
+        <!-- Plantilla estandar -->
+
+        <submission-process name="CIMMYTStandard">
+            <step id="collection"/>
+            <step id="CIMMYTStandardStepOne"/>
+            <step id="cgiarInitiativesStep"/>
+            <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="CIMMYTVideo">
+            <step id="collection"/>
+            <step id="CIMMYTVideoStepOne"/>
+            <step id="CIMMYTVideoStepTwo"/>
+            <step id="cgiarInitiativesStep"/>
+            <step id="upload"/>
+        </submission-process>
+
+        <submission-process name="CIMMYTPhoto">
+            <step id="collection"/>
+            <step id="CIMMYTPhotoStepOne"/>
+            <step id="cgiarInitiativesStep"/>
+            <step id="upload"/>
+            <step id="itemAccessConditions"/>
+        </submission-process>
+
+        <submission-process name="CIMMYTSASLatam">
+            <step id="collection"/>
+            <step id="CIMMYTSASLatamStepOne"/>
+            <step id="cgiarInitiativesStep"/>
+            <step id="upload"/>
+            <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="Person">
+            <step id="collection"/>
+            <step id="personStep"/>
+        </submission-process>   
+
+
+        <!-- ___________________________ -->
+        <!-- CIMMYT submission processes -->
+        <!-- ___________________________ -->
     </submission-definitions>
 
 </item-submission>
