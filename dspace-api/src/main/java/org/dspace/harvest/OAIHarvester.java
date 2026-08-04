@@ -77,6 +77,11 @@ import org.oclc.oai.harvester2.verb.ListMetadataFormats;
 import org.oclc.oai.harvester2.verb.ListRecords;
 import org.xml.sax.SAXException;
 
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * This class handles OAI harvesting of externally located records into this repository.
  *
@@ -92,6 +97,7 @@ public class OAIHarvester {
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
     private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+    private static final Namespace MARC_NS = Namespace.getNamespace("https://www.loc.gov/MARC21/slim https://www.loc.gov/standards/marcxml/schema/MARC21slim");
 
     public static final String OAI_ADDRESS_ERROR = "invalidAddress";
     public static final String OAI_SET_ERROR = "noSuchSet";
@@ -109,6 +115,13 @@ public class OAIHarvester {
     protected WorkspaceItemService workspaceItemService;
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
+
+    private static final Pattern OAI_DAY =
+            Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
+
+    /** YYYY-MM-DDThh:mm:ss con fracción y/o Z opcionales */
+    private static final Pattern OAI_SECONDS =
+            Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})(\\.\\d+)?Z?$");
 
 
     //  The collection this harvester instance is dealing with
@@ -278,9 +291,11 @@ public class OAIHarvester {
             try {
                 dateGranularity = oaiGetDateGranularity(oaiSource);
                 if (fromDate != null) {
-                    fromDate = fromDate.substring(0, dateGranularity.length());
+                    // fromDate = fromDate.substring(0, dateGranularity.length());
+                    fromDate = sanitizeOaiDate(truncateToGranularity(fromDate, dateGranularity));
                 }
-                toDate = toDate.substring(0, dateGranularity.length());
+                //toDate = toDate.substring(0, dateGranularity.length());
+                toDate = sanitizeOaiDate(truncateToGranularity(toDate, dateGranularity));
 
                 descMDPrefix = oaiResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
                 OREPrefix = oaiResolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
@@ -533,6 +548,16 @@ public class OAIHarvester {
         // found an item so we modify
         if (item != null) {
             log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
+
+            Boolean updateHarvestedItem = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("oai.harvester.updateHarvestedItem", false);
+
+            if (!updateHarvestedItem){
+                System.out.println("The Item:" + itemOaiID + " with handle " + item.getHandle() + " update is disabled; skipping.");
+                log.info("Item " + itemOaiID + " was harvested before;" + item.getHandle() +" The Item update is disabled; skipping... ");
+                return;
+            }
+
 
             // FIXME: check for null pointer if for some odd reason we don't have a matching hi
             hi = harvestedItemService.find(ourContext, item);
@@ -912,5 +937,43 @@ public class OAIHarvester {
         }
 
         return configs;
+    }
+
+    public static String sanitizeOaiDate(String date) {
+        if (StringUtils.isBlank(date)) {
+            return date;                       // no tocamos null ni vacío
+        }
+
+        String d = date.trim();
+
+        // 1) Elimina cualquier separador colgante producto de un truncado
+        //    ("2026-07-31T19:37:33." , "...19:37:" , "...2026-07-31T")
+        while (d.length() > 0 && (d.endsWith(".") || d.endsWith(":")
+                || d.endsWith("-") || d.endsWith("T"))) {
+            d = d.substring(0, d.length() - 1);
+        }
+
+        // 2) Granularidad de día: se deja intacta
+        if (OAI_DAY.matcher(d).matches()) {
+            return d;
+        }
+
+        // 3) Granularidad de segundos: se descartan milisegundos y se fuerza la Z
+        Matcher m = OAI_SECONDS.matcher(d);
+        if (m.matches()) {
+            return m.group(1) + "Z";
+        }
+
+        // 4) Formato no reconocido: se devuelve sin la basura final,
+        //    para no enmascarar un error real de configuración
+        return d;
+    }
+
+    private static String truncateToGranularity(String date, String granularity) {
+        if (StringUtils.isBlank(date) || StringUtils.isBlank(granularity)) {
+            return date;
+        }
+        // StringUtils.substring es null-safe y no lanza IndexOutOfBounds
+        return StringUtils.substring(date, 0, granularity.length());
     }
 }

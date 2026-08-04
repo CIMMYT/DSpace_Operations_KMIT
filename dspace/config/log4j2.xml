@@ -44,6 +44,17 @@
             </DefaultRolloverStrategy>
             -->
         </Appender>
+
+        <Appender name='MARC21'
+          filePattern="${log.dir}/marc21-ingestion.log-%d{yyyy-MM-dd}"
+          type='RollingFile'
+          fileName='${log.dir}/marc21-ingestion.log'>
+            <Layout type='PatternLayout'
+                    pattern='%d %-5p [record:%equals{%X{marcRecordId}}{}{unknown}] %c{1} @ %m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+            </policies>
+        </Appender>
     </Appenders>
 
     <Loggers>
@@ -66,6 +77,12 @@
                 level='ERROR'/>
         <Logger name='org.dspace.utils'
                 level='ERROR'/>
+
+        <Logger name='org.dspace.marc21.ingestion'
+                level='DEBUG'
+                additivity='false'>
+            <AppenderRef ref='MARC21'/>
+        </Logger>
 
         <!-- Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth) -->
         <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
