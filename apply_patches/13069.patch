@@ -1,0 +1,285 @@
+From 62073c8ed0f074a893701083eca7ac9a31f335ab Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Wed, 22 Jul 2026 18:31:09 +0200
+Subject: [PATCH 1/4] fix: test request-a-copy isEnabled if token not null
+
+(cherry picked from commit 960ec34ea89e69ec3bd6e47daa432e1a486c7b8f)
+---
+ .../app/rest/BitstreamRestController.java     | 33 +++++++++++--------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+index e5b4ddc11ccd..9618f7eae582 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+@@ -116,29 +116,22 @@ public class BitstreamRestController {
+      * @throws SQLException
+      * @throws AuthorizeException
+      */
+-    @PreAuthorize("#accessToken != null|| hasPermission(#uuid, 'BITSTREAM', 'READ')")
++    @PreAuthorize("#accessToken != null || hasPermission(#uuid, 'BITSTREAM', 'READ')")
+     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
+     public ResponseEntity retrieve(@PathVariable UUID uuid,
+                                    @Parameter(value = "accessToken", required = false) String accessToken,
+                                    HttpServletResponse response,
+                                    HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
+-
++        // Any non-null access token will skip the preauthorize check above so we can
++        // quickly check here to see if the feature is even enabled. If it is not, throw
++        // an authorize exception.
++        if (StringUtils.isNotBlank(accessToken) && !requestACopyEnabled()) {
++            throw new AuthorizeException("Access by token is not allowed");
++        }
+         // Obtain context
+         Context context = ContextUtil.obtainContext(request);
+         // Find bitstream
+         Bitstream bit = bitstreamService.find(context, uuid);
+-        if (bit == null || bit.isDeleted()) {
+-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+-            return null;
+-        }
+-        // Get EPerson
+-        EPerson currentUser = context.getCurrentUser();
+-
+-        // Get bitstream metadata
+-        Long lastModified = bitstreamService.getLastModified(bit);
+-        BitstreamFormat format = bit.getFormat(context);
+-        String mimetype = format.getMIMEType();
+-        String name = getBitstreamName(bit, format);
+ 
+         // If an access token is found, immediately authenticate it if request a copy is enabled
+         // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
+@@ -159,6 +152,18 @@ public ResponseEntity retrieve(@PathVariable UUID uuid,
+         // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
+         // access token here
+ 
++        if (bit == null || bit.isDeleted()) {
++            response.sendError(HttpServletResponse.SC_NOT_FOUND);
++            return null;
++        }
++        // Get EPerson
++        EPerson currentUser = context.getCurrentUser();
++
++        // Get bitstream metadata
++        Long lastModified = bitstreamService.getLastModified(bit);
++        BitstreamFormat format = bit.getFormat(context);
++        String mimetype = format.getMIMEType();
++        String name = getBitstreamName(bit, format);
+         if (StringUtils.isBlank(request.getHeader("Range"))) {
+             //We only log a download request when serving a request without Range header. This is because
+             //a browser always sends a regular request first to check for Range support.
+
+From 62c7f2fbc4fd57550a0a90b4438b872001f87b8b Mon Sep 17 00:00:00 2001
+From: bram-atmire <bram@mire.be>
+Date: Sat, 15 Aug 2026 09:25:49 +0200
+Subject: [PATCH 2/4] test: cover unvalidated bitstream access tokens
+
+Add GET and HEAD coverage for invalid and blank tokens with Request-a-Copy enabled and disabled, plus a regression check for the Bitstream UUID existence oracle.
+
+(cherry picked from commit df3dcfa72f76cf5e0640c9faf7a5bd99f1bc1a46)
+---
+ .../app/rest/BitstreamRestControllerIT.java   | 103 ++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+
+diff --git a/dspace-server-webapp/src/test/java/org/dspace/app/rest/BitstreamRestControllerIT.java b/dspace-server-webapp/src/test/java/org/dspace/app/rest/BitstreamRestControllerIT.java
+index b4542dacb22e..f8d9e84a0ae9 100644
+--- a/dspace-server-webapp/src/test/java/org/dspace/app/rest/BitstreamRestControllerIT.java
++++ b/dspace-server-webapp/src/test/java/org/dspace/app/rest/BitstreamRestControllerIT.java
+@@ -50,6 +50,7 @@
+ import java.io.InputStream;
+ import java.io.StringWriter;
+ import java.io.Writer;
++import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+ import java.time.Period;
+ import java.util.Map;
+@@ -1544,6 +1545,108 @@ private void givenPdf(boolean coverPageEnabled, ThrowingConsumer<File> block) {
+         }
+     }
+ 
++    /**
++     * Build a restricted Bitstream readable only by a group to which the test users do not belong.
++     *
++     * @return restricted Bitstream
++     * @throws Exception if the test object cannot be created
++     */
++    private Bitstream createRestrictedBitstream() throws Exception {
++        context.turnOffAuthorisationSystem();
++        try {
++            parentCommunity = CommunityBuilder.createCommunity(context)
++                                              .withName("Parent Community")
++                                              .build();
++            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
++                                               .withName("Collection 1")
++                                               .build();
++            Group restrictedGroup = GroupBuilder.createGroup(context)
++                                                .withName("Restricted Group")
++                                                .build();
++
++            try (InputStream is = IOUtils.toInputStream("Secret file contents", StandardCharsets.UTF_8)) {
++                Item item = ItemBuilder.createItem(context, col1)
++                                       .withTitle("item 1")
++                                       .withIssueDate("2013-01-17")
++                                       .withAuthor("Doe, John")
++                                       .build();
++                return BitstreamBuilder.createBitstream(context, item, is)
++                                       .withName("secret.txt")
++                                       .withDescription("This bitstream is restricted")
++                                       .withMimeType("text/plain")
++                                       .withReaderGroup(restrictedGroup)
++                                       .build();
++            }
++        } finally {
++            context.restoreAuthSystemState();
++        }
++    }
++
++    /**
++     * A supplied access token must be validated before GET or HEAD can reach the Bitstream response handling.
++     */
++    @Test
++    public void restrictedBitstreamHeadWithUnvalidatedAccessTokenTest() throws Exception {
++        Bitstream restrictedBitstream = createRestrictedBitstream();
++        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
++
++        // Baseline: without an access token, anonymous is refused on both GET and HEAD.
++        getClient().perform(get(contentUrl)).andExpect(status().isUnauthorized());
++        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
++
++        // A bogus token must be rejected, not merely present.
++        getClient().perform(head(contentUrl).param("accessToken", "invalid_token"))
++                   .andExpect(status().isUnauthorized());
++        getClient().perform(get(contentUrl).param("accessToken", "invalid_token"))
++                   .andExpect(status().isUnauthorized());
++
++        // A blank token must go through the normal Bitstream READ permission check.
++        getClient().perform(head(contentUrl).param("accessToken", ""))
++                   .andExpect(status().isUnauthorized());
++        getClient().perform(get(contentUrl).param("accessToken", ""))
++                   .andExpect(status().isUnauthorized());
++    }
++
++    /**
++     * Access-token authorization must not be available when Request-a-Copy is disabled.
++     */
++    @Test
++    public void restrictedBitstreamHeadWithAccessTokenRequestACopyDisabledTest() throws Exception {
++        configurationService.setProperty("request.item.type", null);
++
++        Bitstream restrictedBitstream = createRestrictedBitstream();
++        String contentUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
++
++        getClient().perform(head(contentUrl)).andExpect(status().isUnauthorized());
++        getClient().perform(head(contentUrl).param("accessToken", "x"))
++                   .andExpect(status().isUnauthorized());
++        getClient().perform(get(contentUrl).param("accessToken", "x"))
++                   .andExpect(status().isUnauthorized());
++        getClient().perform(head(contentUrl).param("accessToken", ""))
++                   .andExpect(status().isUnauthorized());
++        getClient().perform(get(contentUrl).param("accessToken", ""))
++                   .andExpect(status().isUnauthorized());
++    }
++
++    /**
++     * Invalid token responses must not reveal whether a Bitstream UUID exists.
++     */
++    @Test
++    public void unknownBitstreamWithAccessTokenIsNotAnExistenceOracleTest() throws Exception {
++        Bitstream restrictedBitstream = createRestrictedBitstream();
++
++        String restrictedUrl = "/api/core/bitstreams/" + restrictedBitstream.getID() + "/content";
++        String unknownUrl = "/api/core/bitstreams/" + UUID.randomUUID() + "/content";
++
++        int restrictedStatus = getClient().perform(head(restrictedUrl).param("accessToken", "invalid_token"))
++                                          .andReturn().getResponse().getStatus();
++        int unknownStatus = getClient().perform(head(unknownUrl).param("accessToken", "invalid_token"))
++                                       .andReturn().getResponse().getStatus();
++
++        assertEquals("An unauthorized caller must not be able to tell an existing restricted Bitstream apart "
++                         + "from a nonexistent one", restrictedStatus, unknownStatus);
++    }
++
+     @Test
+     public void restrictedBitstreamWithAccessTokenTest() throws Exception {
+         context.turnOffAuthorisationSystem();
+
+From 31064bcca6af8c4affdc5ea343dd6a7a8b103791 Mon Sep 17 00:00:00 2001
+From: bram-atmire <bram@mire.be>
+Date: Sat, 15 Aug 2026 09:25:49 +0200
+Subject: [PATCH 3/4] fix: require a nonblank bitstream access token
+
+Use the null-safe Apache Commons isNotBlank predicate in preauthorization so blank tokens fall through to the normal Bitstream READ permission check.
+
+(cherry picked from commit f270501d45ee82007bef9d27bc75902d3357f1ea)
+---
+ .../java/org/dspace/app/rest/BitstreamRestController.java    | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+index 9618f7eae582..e0f1e3e5ce4e 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+@@ -116,7 +116,10 @@ public class BitstreamRestController {
+      * @throws SQLException
+      * @throws AuthorizeException
+      */
+-    @PreAuthorize("#accessToken != null || hasPermission(#uuid, 'BITSTREAM', 'READ')")
++    // Keep this condition aligned with the isNotBlank checks in the method body. If preauthorization accepts a
++    // token that the body ignores, the request reaches the response handling without a Bitstream READ check.
++    @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
++        " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
+     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
+     public ResponseEntity retrieve(@PathVariable UUID uuid,
+                                    @Parameter(value = "accessToken", required = false) String accessToken,
+
+From 9f215eea1d2f4908b3a60da11d2ace3284e977fa Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Wed, 2 Sep 2026 17:28:58 +0200
+Subject: [PATCH 4/4] Tidy up inline comments
+
+(cherry picked from commit cc9ff12bb254190372d7b7631360646c404a3d2b)
+---
+ .../org/dspace/app/rest/BitstreamRestController.java     | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+index e0f1e3e5ce4e..dade42324613 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/BitstreamRestController.java
+@@ -116,8 +116,6 @@ public class BitstreamRestController {
+      * @throws SQLException
+      * @throws AuthorizeException
+      */
+-    // Keep this condition aligned with the isNotBlank checks in the method body. If preauthorization accepts a
+-    // token that the body ignores, the request reaches the response handling without a Bitstream READ check.
+     @PreAuthorize("T(org.apache.commons.lang3.StringUtils).isNotBlank(#accessToken)" +
+         " || hasPermission(#uuid, 'BITSTREAM', 'READ')")
+     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
+@@ -137,8 +135,7 @@ public ResponseEntity retrieve(@PathVariable UUID uuid,
+         Bitstream bit = bitstreamService.find(context, uuid);
+ 
+         // If an access token is found, immediately authenticate it if request a copy is enabled
+-        // Though, if we do further "has to be loggd in requester" checks we'll have to check here anyway
+-        // Even if eperson is not null and has access, we will treat this token as the primary means of
++        // Even if EPerson is not null and has access, we will treat this token as the primary means of
+         // authorizing bitstream download access
+         boolean authorizedByAccessToken = false;
+         // There may be a way of checking enabled in preauth
+@@ -150,7 +147,7 @@ public ResponseEntity retrieve(@PathVariable UUID uuid,
+             authorizedByAccessToken = true;
+             log.debug("Authorize access by token={} bitstream={}", accessToken, bit.getID());
+         }
+-        // If an authorization error was encountered it will be rethrown by this method even if the eperson
++        // If an authorization error was encountered it will be rethrown by the above method even if the eperson
+         // could technically READ the bitstream normally. This is for consistency and clarify of usage - if we
+         // want a fallback we will need to reauthenticate as otherwise any eperson could have supplied a non-blank
+         // access token here
+@@ -184,8 +181,6 @@ public ResponseEntity retrieve(@PathVariable UUID uuid,
+             long filesize = bit.getSizeBytes();
+             Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
+ 
+-
+-
+             // Generate a special bitstream resource stream depending on whether we are accessing by token
+             // or eperson / group access
+             org.dspace.app.rest.utils.BitstreamResource bitstreamResource;

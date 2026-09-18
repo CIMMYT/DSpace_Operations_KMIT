@@ -1,0 +1,725 @@
+From 8d92df13d600bfd67af38aab77e6381d14ee9718 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 4 Sep 2026 15:15:02 +0200
+Subject: [PATCH 1/7] add getBufferedWriter method to SecureFileAccess
+
+(cherry picked from commit 4411b5d4f007fe8b0fd79923442e1daa3a2bcd51)
+---
+ .../storage/secure/SecureFileAccess.java      | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/dspace-api/src/main/java/org/dspace/storage/secure/SecureFileAccess.java b/dspace-api/src/main/java/org/dspace/storage/secure/SecureFileAccess.java
+index 3d70831b0b9f..dfd5e3c1192a 100644
+--- a/dspace-api/src/main/java/org/dspace/storage/secure/SecureFileAccess.java
++++ b/dspace-api/src/main/java/org/dspace/storage/secure/SecureFileAccess.java
+@@ -8,6 +8,7 @@
+ package org.dspace.storage.secure;
+ 
+ import java.io.BufferedReader;
++import java.io.BufferedWriter;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
+@@ -98,6 +99,7 @@ public static Path validatePathForRead(String file, List<String> allowedBasePath
+      * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
+      * @param allowedBasePaths the allowed base paths for this use case as per system configuration
+      * @param purpose the name of the calling component / use case for logging and inspection
++     * @param charset the charset to use, or UTF-8 if null
+      * @throws IOException on validation failure
+      */
+     public static BufferedReader getBufferedReader(String unvalidatedFile, List<String> allowedBasePaths,
+@@ -137,6 +139,25 @@ public static OutputStream getOutputStream(String unvalidatedFile, List<String>
+         return Files.newOutputStream(validatedFile);
+     }
+ 
++    /**
++     * Get a buffered writer after validating file path. As with {@link #getOutputStream}, new files
++     * can't use toRealPath() for link calculation so there is a trade-off allowing some symlink
++     * traversal to occur.
++     * @param unvalidatedFile the unvalidated file, usually derived from user input or configuration
++     * @param allowedBasePaths the allowed base paths for this use case as per system configuration
++     * @param purpose the name of the calling component / use case for logging and inspection
++     * @param charset the charset to use, or UTF-8 if null
++     * @throws IOException on validation failure
++     */
++    public static BufferedWriter getBufferedWriter(String unvalidatedFile, List<String> allowedBasePaths,
++            String purpose, Charset charset) throws IOException {
++        if (charset == null) {
++            charset = StandardCharsets.UTF_8;
++        }
++        Path validatedFile = validatePathForWrite(unvalidatedFile, allowedBasePaths, purpose);
++        return Files.newBufferedWriter(validatedFile, charset);
++    }
++
+     /**
+      * Calculate an absolute path (if not already absolute) using current working dir as a root
+      * for relative file paths
+
+From 29ee902065f8e3d0b8daa3795ef72738c55c9cb1 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 4 Sep 2026 11:56:42 +0200
+Subject: [PATCH 2/7] Improve file I/O in ItemExportServiceImpl
+
+(cherry picked from commit 77048dfd3c1577fdbc23708c141223338c27c869)
+---
+ .../app/itemexport/ItemExportServiceImpl.java | 135 +++++++++---------
+ .../app/itemexport/ItemExportCLIIT.java       |  64 +++++++++
+ dspace/config/dspace.cfg                      |   5 +
+ 3 files changed, 135 insertions(+), 69 deletions(-)
+
+diff --git a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+index 84adac54efb3..d102bbe3711d 100644
+--- a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
++++ b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+@@ -11,18 +11,19 @@
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.FileNotFoundException;
+-import java.io.FileOutputStream;
+-import java.io.FileWriter;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.io.OutputStream;
+ import java.io.PrintWriter;
+ import java.nio.charset.StandardCharsets;
++import java.nio.file.Files;
+ import java.sql.SQLException;
+ import java.time.Instant;
+ import java.time.LocalDate;
+ import java.time.format.DateTimeFormatter;
+ import java.time.temporal.ChronoUnit;
+ import java.util.ArrayList;
++import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.HashSet;
+ import java.util.Iterator;
+@@ -30,6 +31,7 @@
+ import java.util.Locale;
+ import java.util.Set;
+ import java.util.UUID;
++import java.util.stream.Collectors;
+ import java.util.zip.ZipEntry;
+ import java.util.zip.ZipOutputStream;
+ 
+@@ -60,6 +62,7 @@
+ import org.dspace.handle.service.HandleService;
+ import org.dspace.scripts.handler.DSpaceRunnableHandler;
+ import org.dspace.services.ConfigurationService;
++import org.dspace.storage.secure.SecureFileAccess;
+ import org.springframework.beans.factory.annotation.Autowired;
+ 
+ /**
+@@ -114,11 +117,33 @@ protected ItemExportServiceImpl() {
+ 
+     }
+ 
++    /**
++     * Get the configured list of allowed base directories for item export.
++     * @return list of absolute allowed base paths, or null
++     */
++    protected List<String> getAllowedExportBaseDirs() {
++        String[] configured =
++            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir");
++        if (configured == null || configured.length == 0) {
++            return null;
++        }
++        return Arrays.stream(configured)
++                     .map(String::trim)
++                     .collect(Collectors.toList());
++    }
+ 
+     @Override
+     public void exportItem(Context c, Iterator<Item> i,
+                            String destDirName, int seqStart, boolean migrate,
+                            boolean excludeBitstreams) throws Exception {
++        // Validate dest dir argument against a base path, if configured
++        // (otherwise trust user input)
++        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
++        if (allowedBaseDirs != null) {
++            destDirName = SecureFileAccess.validatePathForWrite(
++                destDirName, allowedBaseDirs, "itemexport").toString();
++        }
++
+         int mySequenceNumber = seqStart;
+         int counter = SUBDIR_LIMIT - 1;
+         int subDirSuffix = 0;
+@@ -231,13 +256,11 @@ protected void writeMetadata(Context c, String schema, Item i,
+             filename = "metadata_" + schema + ".xml";
+         }
+ 
+-        File outFile = new File(destDir, filename);
++        logInfo("Attempting to create metadata file " + filename + " in " + destDir);
+ 
+-        logInfo("Attempting to create file " + outFile);
+-
+-        if (outFile.createNewFile()) {
+-            BufferedOutputStream out = new BufferedOutputStream(
+-                new FileOutputStream(outFile));
++        try (BufferedOutputStream out = new BufferedOutputStream(SecureFileAccess.getOutputStream(
++                new File(destDir, filename).getPath(),
++                List.of(destDir.getPath()), "itemexport"))) {
+ 
+             List<MetadataValue> dcorevalues = itemService.getMetadata(i, schema, Item.ANY, Item.ANY,
+                                                                       Item.ANY);
+@@ -314,10 +337,8 @@ protected void writeMetadata(Context c, String schema, Item i,
+ 
+             utf8 = "</dublin_core>\n".getBytes("UTF-8");
+             out.write(utf8, 0, utf8.length);
+-
+-            out.close();
+-        } else {
+-            throw new Exception("Cannot create dublin_core.xml in " + destDir);
++        } catch (IOException e) {
++            throw new IOException("Cannot create " + filename + " in " + destDir, e);
+         }
+     }
+ 
+@@ -336,18 +357,10 @@ protected void writeHandle(Context c, Item i, File destDir)
+         }
+         String filename = "handle";
+ 
+-        File outFile = new File(destDir, filename);
+-
+-        if (outFile.createNewFile()) {
+-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
+-
++        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
++                new File(destDir, filename).getPath(),
++                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
+             out.println(i.getHandle());
+-
+-            // close the contents file
+-            out.close();
+-        } else {
+-            throw new Exception("Cannot create file " + filename + " in "
+-                                    + destDir);
+         }
+     }
+ 
+@@ -361,22 +374,19 @@ protected void writeHandle(Context c, Item i, File destDir)
+      */
+     protected void writeCollections(Item item, File destDir)
+             throws IOException {
+-        File outFile = new File(destDir, "collections");
+-        if (outFile.createNewFile()) {
+-            try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
+-                Collection owningCollection = item.getOwningCollection();
+-                // The owning collection is null for workspace and workflow items
+-                if (owningCollection != null) {
+-                    out.println(owningCollection.getHandle());
+-                }
+-                for (Collection collection : item.getCollections()) {
+-                    if (!collection.equals(owningCollection)) {
+-                        out.println(collection.getHandle());
+-                    }
++        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
++                new File(destDir, "collections").getPath(),
++                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
++            Collection owningCollection = item.getOwningCollection();
++            // The owning collection is null for workspace and workflow items
++            if (owningCollection != null) {
++                out.println(owningCollection.getHandle());
++            }
++            for (Collection collection : item.getCollections()) {
++                if (!collection.equals(owningCollection)) {
++                    out.println(collection.getHandle());
+                 }
+             }
+-        } else {
+-            throw new IOException("Cannot create 'collections' in " + destDir);
+         }
+     }
+ 
+@@ -395,10 +405,9 @@ protected void writeCollections(Item item, File destDir)
+      */
+     protected void writeBitstreams(Context c, Item i, File destDir,
+                                    boolean excludeBitstreams) throws Exception {
+-        File outFile = new File(destDir, "contents");
+-
+-        if (outFile.createNewFile()) {
+-            PrintWriter out = new PrintWriter(new FileWriter(outFile, StandardCharsets.UTF_8));
++        try (PrintWriter out = new PrintWriter(SecureFileAccess.getBufferedWriter(
++                new File(destDir, "contents").getPath(),
++                List.of(destDir.getPath()), "itemexport", StandardCharsets.UTF_8))) {
+ 
+             List<Bundle> bundles = i.getBundles();
+ 
+@@ -430,33 +439,26 @@ protected void writeBitstreams(Context c, Item i, File destDir,
+                     // written
+ 
+                     while (!excludeBitstreams && !isDone) {
+-                        if (myName.contains(File.separator)) {
+-                            String dirs = myName.substring(0, myName
+-                                .lastIndexOf(File.separator));
+-                            File fdirs = new File(destDir + File.separator
+-                                                      + dirs);
+-                            if (!fdirs.exists() && !fdirs.mkdirs()) {
+-                                logError("Unable to create destination directory");
+-                            }
++                        File fout = SecureFileAccess.validatePathForWrite(
++                            new File(destDir, myName).getPath(),
++                            List.of(destDir.getPath()), "itemexport").toFile();
++                        // Allow nested dirs in file name but still validate to parent file dir
++                        File parentDir = fout.getParentFile();
++                        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
++                            logError("Unable to create destination directory");
+                         }
+ 
+-                        File fout = new File(destDir, myName);
+-
+-                        if (fout.createNewFile()) {
+-                            InputStream is = bitstreamService.retrieve(c, bitstream);
+-                            FileOutputStream fos = new FileOutputStream(fout);
+-                            Utils.bufferedCopy(is, fos);
+-                            // close streams
+-                            is.close();
+-                            fos.close();
+-
++                        // Filename collision detection.
++                        if (!Files.exists(fout.toPath())) {
++                            try (InputStream is = bitstreamService.retrieve(c, bitstream);
++                                 OutputStream fos = SecureFileAccess.getOutputStream(
++                                     fout.getPath(), List.of(destDir.getPath()), "itemexport")) {
++                                Utils.bufferedCopy(is, fos);
++                            }
+                             isDone = true;
+                         } else {
+-                            myName = myPrefix + "_" + oldName; // keep
+-                            // appending
+-                            // numbers to the
+-                            // filename until
+-                            // unique
++                            myName = myPrefix + "_" + oldName;
++                            // keep appending numbers to the filename until unique
+                             myPrefix++;
+                         }
+                     }
+@@ -474,11 +476,6 @@ protected void writeBitstreams(Context c, Item i, File destDir,
+ 
+                 }
+             }
+-
+-            // close the contents file
+-            out.close();
+-        } else {
+-            throw new Exception("Cannot create contents in " + destDir);
+         }
+     }
+ 
+diff --git a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+index bf97e7aa49ed..b184e6d14e41 100644
+--- a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
++++ b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+@@ -8,7 +8,9 @@
+ package org.dspace.app.itemexport;
+ 
+ import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
+ import static org.junit.Assert.assertNotNull;
++import static org.junit.Assert.assertThrows;
+ import static org.junit.Assert.assertTrue;
+ 
+ import java.io.File;
+@@ -78,11 +80,15 @@ public void setUp() throws Exception {
+             Files.createDirectory(Path.of(file.getAbsolutePath()));
+         }
+         workDir = Path.of(file.getAbsolutePath());
++
++        configurationService.setProperty("org.dspace.app.itemexport.allowed.dir",
++                new String[] { tempDir.toString(), workDir.toString() });
+     }
+ 
+     @After
+     @Override
+     public void destroy() throws Exception {
++        configurationService.setProperty("org.dspace.app.itemexport.allowed.dir", null);
+         PathUtils.deleteOnExit(tempDir);
+         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
+             PathUtils.deleteOnExit(path);
+@@ -319,6 +325,64 @@ public void migrateItemWithAnotherMetadataSchema() throws Exception {
+         checkItemMigration(item);
+     }
+ 
++    @Test
++    public void exportItemWithPathTraversalBitstreamName() throws Exception {
++        Path notAllowed = Files.createTempDirectory("notSafExportDir");
++        String traversalName = "../../../../../../../"
++                + notAllowed.getFileName().toString() + "/test.txt";
++
++        context.turnOffAuthorisationSystem();
++        Item item = ItemBuilder.createItem(context, collection)
++                .withTitle(title)
++                .withMetadata("dc", "date", "issued", dateIssued)
++                .build();
++        String bitstreamContent = "some arbitrary content";
++        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
++            BitstreamBuilder.createBitstream(context, item, is)
++                    .withName(traversalName)
++                    .withMimeType("text/plain")
++                    .build();
++        }
++        context.restoreAuthSystemState();
++
++        String[] args = new String[] { "export", "-t", "ITEM",
++                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
++
++        // Exception should be thrown at validation
++        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
++        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
++
++        // File should never have been written
++        assertFalse(Files.exists(notAllowed.resolve("test.txt")));
++        PathUtils.deleteOnExit(notAllowed);
++    }
++
++    @Test
++    public void exportRejectedWhenDestDirOutsideAllowedBase() throws Exception {
++        configurationService.setProperty(
++                "org.dspace.app.itemexport.allowed.dir", workDir.toString());
++
++        Path notAllowed = Files.createTempDirectory("");
++
++        context.turnOffAuthorisationSystem();
++        Item item = ItemBuilder.createItem(context, collection)
++                .withTitle(title)
++                .withMetadata("dc", "date", "issued", dateIssued)
++                .build();
++        context.restoreAuthSystemState();
++
++        String[] args = new String[] { "export", "-t", "ITEM",
++                "-i", item.getHandle(), "-d", notAllowed.toString(), "-n", "1" };
++
++        // Exception should be thrown at validation
++        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args));
++        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
++
++        // File should never have been written
++        assertFalse(Files.list(notAllowed).findAny().isPresent());
++        PathUtils.deleteOnExit(notAllowed);
++    }
++
+     /**
+      * Check created export directory
+      * @throws Exception
+diff --git a/dspace/config/dspace.cfg b/dspace/config/dspace.cfg
+index f100c7dab9e2..b87f23d89855 100644
+--- a/dspace/config/dspace.cfg
++++ b/dspace/config/dspace.cfg
+@@ -934,6 +934,11 @@ checker.retention.CHECKSUM_MATCH=8w
+ # The directory where the exports will be done and compressed
+ org.dspace.app.itemexport.work.dir = ${dspace.dir}/exports
+ 
++# Allowed base directories for item export output. If configured, this directory
++# will be enforced as the parent dir of all exports, including downloads, CLI "-d"
++# destination path, and so on. To allow any base directory, comment out or leave blank
++org.dspace.app.itemexport.allowed.dir = ${dspace.dir}/exports
++
+ # The directory where the compressed files will reside and be read by the downloader
+ org.dspace.app.itemexport.download.dir = ${dspace.dir}/exports/download
+ 
+
+From da7109c0464e2019624bb72abaf7d04de23f9236 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 4 Sep 2026 15:50:21 +0200
+Subject: [PATCH 3/7] Improve zip file I/O in ItemExportServiceImpl
+
+(cherry picked from commit 4ac21f10119ffe921a9d2d5bae05d6a1f9e2f87c)
+---
+ .../app/itemexport/ItemExportServiceImpl.java  | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+index d102bbe3711d..48b1f984e222 100644
+--- a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
++++ b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+@@ -484,9 +484,17 @@ public void exportAsZip(Context context, Iterator<Item> items,
+                             String destDirName, String zipFileName,
+                             int seqStart, boolean migrate,
+                             boolean excludeBitstreams) throws Exception {
++        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
++        if (allowedBaseDirs != null) {
++            destDirName = SecureFileAccess.validatePathForWrite(
++                destDirName, allowedBaseDirs, "itemexport").toString();
++        }
++
+         String workDir = getExportWorkDirectory() +
+             System.getProperty("file.separator") +
+             zipFileName;
++        workDir = SecureFileAccess.validatePathForWrite(
++            workDir, List.of(getExportWorkDirectory()), "itemexport").toString();
+ 
+         File wkDir = new File(workDir);
+         if (!wkDir.exists() && !wkDir.mkdirs()) {
+@@ -998,6 +1006,14 @@ public void emailErrorMessage(EPerson eperson, String error)
+     public void zip(String strSource, String target) throws Exception {
+         ZipOutputStream cpZipOutputStream = null;
+         String tempFileName = target + "_tmp";
++        // TODO: is this out of scope for the specific fix?
++        //  and adds extra docs since download, cli export etc must now share a base path
++        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
++        if (allowedBaseDirs == null) {
++            File parent = new File(target).getParentFile();
++            allowedBaseDirs = List.of(parent != null ? parent.getPath() : ".");
++        }
++        SecureFileAccess.validatePathForWrite(target, allowedBaseDirs, "itemexport");
+         try {
+             File cpFile = new File(strSource);
+             if (!cpFile.isFile() && !cpFile.isDirectory()) {
+@@ -1008,7 +1024,7 @@ public void zip(String strSource, String target) throws Exception {
+                 logWarn("Target file already exists: " + targetFile.getName());
+             }
+ 
+-            FileOutputStream fos = new FileOutputStream(tempFileName);
++            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, allowedBaseDirs, "itemexport");
+             cpZipOutputStream = new ZipOutputStream(fos);
+             cpZipOutputStream.setLevel(9);
+             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
+
+From 78da160da5111e69597d24e0285a40de58b83f33 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 4 Sep 2026 17:45:13 +0200
+Subject: [PATCH 4/7] Apply stricter default (workdir) value to allowed export
+ dir
+
+(cherry picked from commit 9f7e12d48ab28993af72e844d736479a55d7bed4)
+---
+ .../app/itemexport/ItemExportServiceImpl.java | 37 +++++--------------
+ 1 file changed, 10 insertions(+), 27 deletions(-)
+
+diff --git a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+index 48b1f984e222..772b2ec362e4 100644
+--- a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
++++ b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+@@ -119,14 +119,12 @@ protected ItemExportServiceImpl() {
+ 
+     /**
+      * Get the configured list of allowed base directories for item export.
+-     * @return list of absolute allowed base paths, or null
++     * @return list of absolute allowed base paths. If this is an empty list, it will forbid all exports
+      */
+-    protected List<String> getAllowedExportBaseDirs() {
++    protected List<String> getAllowedExportBaseDirs() throws Exception {
++        String workDir = getExportWorkDirectory();
+         String[] configured =
+-            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir");
+-        if (configured == null || configured.length == 0) {
+-            return null;
+-        }
++            configurationService.getArrayProperty("org.dspace.app.itemexport.allowed.dir", new String[]{workDir});
+         return Arrays.stream(configured)
+                      .map(String::trim)
+                      .collect(Collectors.toList());
+@@ -136,13 +134,8 @@ protected List<String> getAllowedExportBaseDirs() {
+     public void exportItem(Context c, Iterator<Item> i,
+                            String destDirName, int seqStart, boolean migrate,
+                            boolean excludeBitstreams) throws Exception {
+-        // Validate dest dir argument against a base path, if configured
+-        // (otherwise trust user input)
+-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+-        if (allowedBaseDirs != null) {
+-            destDirName = SecureFileAccess.validatePathForWrite(
+-                destDirName, allowedBaseDirs, "itemexport").toString();
+-        }
++        destDirName = SecureFileAccess.validatePathForWrite(
++            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
+ 
+         int mySequenceNumber = seqStart;
+         int counter = SUBDIR_LIMIT - 1;
+@@ -484,11 +477,8 @@ public void exportAsZip(Context context, Iterator<Item> items,
+                             String destDirName, String zipFileName,
+                             int seqStart, boolean migrate,
+                             boolean excludeBitstreams) throws Exception {
+-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+-        if (allowedBaseDirs != null) {
+-            destDirName = SecureFileAccess.validatePathForWrite(
+-                destDirName, allowedBaseDirs, "itemexport").toString();
+-        }
++        destDirName = SecureFileAccess.validatePathForWrite(
++            destDirName, getAllowedExportBaseDirs(), "itemexport").toString();
+ 
+         String workDir = getExportWorkDirectory() +
+             System.getProperty("file.separator") +
+@@ -1006,14 +996,7 @@ public void emailErrorMessage(EPerson eperson, String error)
+     public void zip(String strSource, String target) throws Exception {
+         ZipOutputStream cpZipOutputStream = null;
+         String tempFileName = target + "_tmp";
+-        // TODO: is this out of scope for the specific fix?
+-        //  and adds extra docs since download, cli export etc must now share a base path
+-        List<String> allowedBaseDirs = getAllowedExportBaseDirs();
+-        if (allowedBaseDirs == null) {
+-            File parent = new File(target).getParentFile();
+-            allowedBaseDirs = List.of(parent != null ? parent.getPath() : ".");
+-        }
+-        SecureFileAccess.validatePathForWrite(target, allowedBaseDirs, "itemexport");
++        SecureFileAccess.validatePathForWrite(target, getAllowedExportBaseDirs(), "itemexport");
+         try {
+             File cpFile = new File(strSource);
+             if (!cpFile.isFile() && !cpFile.isDirectory()) {
+@@ -1024,7 +1007,7 @@ public void zip(String strSource, String target) throws Exception {
+                 logWarn("Target file already exists: " + targetFile.getName());
+             }
+ 
+-            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, allowedBaseDirs, "itemexport");
++            OutputStream fos = SecureFileAccess.getOutputStream(tempFileName, getAllowedExportBaseDirs(), "itemexport");
+             cpZipOutputStream = new ZipOutputStream(fos);
+             cpZipOutputStream.setLevel(9);
+             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
+
+From d5f8e802c92d8ec1f618de5a0638a4e08dac3821 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 4 Sep 2026 18:14:52 +0200
+Subject: [PATCH 5/7] Document stricter default of itemexport.allowed.dir
+
+(cherry picked from commit 3a731e5eb67368d1d671de07a77e49c111121e98)
+---
+ dspace/config/dspace.cfg | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/dspace/config/dspace.cfg b/dspace/config/dspace.cfg
+index b87f23d89855..fa4bc27c3142 100644
+--- a/dspace/config/dspace.cfg
++++ b/dspace/config/dspace.cfg
+@@ -934,10 +934,11 @@ checker.retention.CHECKSUM_MATCH=8w
+ # The directory where the exports will be done and compressed
+ org.dspace.app.itemexport.work.dir = ${dspace.dir}/exports
+ 
+-# Allowed base directories for item export output. If configured, this directory
+-# will be enforced as the parent dir of all exports, including downloads, CLI "-d"
+-# destination path, and so on. To allow any base directory, comment out or leave blank
+-org.dspace.app.itemexport.allowed.dir = ${dspace.dir}/exports
++# Allowed base directories for item export output. This directory
++# will be enforced as the parent dir of all exports, including downloads, script "-d"
++# destination path, and so on. The default value matches org.dspace.app.itemexport.work.dir.
++# If this property is set to an empty list or value, all exports will be forbidden.
++#org.dspace.app.itemexport.allowed.dir = ${org.dspace.app.itemexport.work.dir}
+ 
+ # The directory where the compressed files will reside and be read by the downloader
+ org.dspace.app.itemexport.download.dir = ${dspace.dir}/exports/download
+
+From 075024fe8a48d87c1af1e22c0ed5be0887e43411 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Sat, 5 Sep 2026 14:23:15 +0200
+Subject: [PATCH 6/7] Better description of allowed export dir default
+ behaviour
+
+(cherry picked from commit 417960fe4654718f46ddaef0e594df19bef071a5)
+---
+ .../app/itemexport/ItemExportServiceImpl.java |  2 ++
+ .../app/itemexport/ItemExportCLIIT.java       | 31 +++++++++++++++++--
+ dspace/config/dspace.cfg                      |  1 -
+ 3 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+index 772b2ec362e4..0ec64e838639 100644
+--- a/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
++++ b/dspace-api/src/main/java/org/dspace/app/itemexport/ItemExportServiceImpl.java
+@@ -120,6 +120,8 @@ protected ItemExportServiceImpl() {
+     /**
+      * Get the configured list of allowed base directories for item export.
+      * @return list of absolute allowed base paths. If this is an empty list, it will forbid all exports
++     *         but in practice, it will always at least default to workDir, and
++     *         {@link getExportWorkDirectory} throws an Exception if not set
+      */
+     protected List<String> getAllowedExportBaseDirs() throws Exception {
+         String workDir = getExportWorkDirectory();
+diff --git a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+index b184e6d14e41..90de3cab67dd 100644
+--- a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
++++ b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+@@ -88,7 +88,6 @@ public void setUp() throws Exception {
+     @After
+     @Override
+     public void destroy() throws Exception {
+-        configurationService.setProperty("org.dspace.app.itemexport.allowed.dir", null);
+         PathUtils.deleteOnExit(tempDir);
+         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
+             PathUtils.deleteOnExit(path);
+@@ -362,7 +361,7 @@ public void exportRejectedWhenDestDirOutsideAllowedBase() throws Exception {
+         configurationService.setProperty(
+                 "org.dspace.app.itemexport.allowed.dir", workDir.toString());
+ 
+-        Path notAllowed = Files.createTempDirectory("");
++        Path notAllowed = Files.createTempDirectory("notSafExportDir");
+ 
+         context.turnOffAuthorisationSystem();
+         Item item = ItemBuilder.createItem(context, collection)
+@@ -383,6 +382,34 @@ public void exportRejectedWhenDestDirOutsideAllowedBase() throws Exception {
+         PathUtils.deleteOnExit(notAllowed);
+     }
+ 
++    @Test
++    public void allowedDirDefaultsToExportWorkDir() throws Exception {
++        // default array property is workDir, used on null or empty value set
++        configurationService.setProperty(
++                "org.dspace.app.itemexport.allowed.dir", new String[]{});
++
++        context.turnOffAuthorisationSystem();
++        Item item = ItemBuilder.createItem(context, collection)
++                .withTitle(title)
++                .withMetadata("dc", "date", "issued", dateIssued)
++                .build();
++        context.restoreAuthSystemState();
++
++        // Work dir should be allowed
++        String[] args = new String[] { "export", "-t", "ITEM",
++                "-i", item.getHandle(), "-d", workDir.toString(), "-n", "1" };
++        perfomExportScript(args);
++        assertTrue(Files.list(workDir).findAny().isPresent());
++
++        String[] args2 = new String[] { "export", "-t", "ITEM",
++                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
++        // Exception should be thrown at validation
++        Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args2));
++        assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
++        // File should never have been written
++        assertFalse(Files.list(workDir).findAny().isPresent());
++    }
++
+     /**
+      * Check created export directory
+      * @throws Exception
+diff --git a/dspace/config/dspace.cfg b/dspace/config/dspace.cfg
+index fa4bc27c3142..8e16d7b5ba8a 100644
+--- a/dspace/config/dspace.cfg
++++ b/dspace/config/dspace.cfg
+@@ -937,7 +937,6 @@ org.dspace.app.itemexport.work.dir = ${dspace.dir}/exports
+ # Allowed base directories for item export output. This directory
+ # will be enforced as the parent dir of all exports, including downloads, script "-d"
+ # destination path, and so on. The default value matches org.dspace.app.itemexport.work.dir.
+-# If this property is set to an empty list or value, all exports will be forbidden.
+ #org.dspace.app.itemexport.allowed.dir = ${org.dspace.app.itemexport.work.dir}
+ 
+ # The directory where the compressed files will reside and be read by the downloader
+
+From 8a62af8bae342e5dc8b264d67546468efa8bc459 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Sat, 5 Sep 2026 15:12:44 +0200
+Subject: [PATCH 7/7] Delete workDir contents after each test, not on JVM exit
+
+(cherry picked from commit 943b065029bf73811347ad1a16586ef8b57e882d)
+---
+ .../test/java/org/dspace/app/itemexport/ItemExportCLIIT.java  | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+index 90de3cab67dd..e591f83b31bf 100644
+--- a/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
++++ b/dspace-api/src/test/java/org/dspace/app/itemexport/ItemExportCLIIT.java
+@@ -90,7 +90,7 @@ public void setUp() throws Exception {
+     public void destroy() throws Exception {
+         PathUtils.deleteOnExit(tempDir);
+         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
+-            PathUtils.deleteOnExit(path);
++            PathUtils.delete(path);
+         }
+         super.destroy();
+     }
+@@ -407,7 +407,7 @@ public void allowedDirDefaultsToExportWorkDir() throws Exception {
+         Exception thrown = assertThrows(Exception.class, () -> perfomExportScript(args2));
+         assertTrue(thrown.getMessage().contains("Illegal file path attempted for I/O (itemexport)"));
+         // File should never have been written
+-        assertFalse(Files.list(workDir).findAny().isPresent());
++        assertFalse(Files.list(tempDir).findAny().isPresent());
+     }
+ 
+     /**

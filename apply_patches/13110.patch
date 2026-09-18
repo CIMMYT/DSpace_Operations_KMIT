@@ -1,0 +1,723 @@
+From a0ee892863a3cbb2228338e30ac6053d05178b0f Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 24 Jul 2026 17:00:22 +0200
+Subject: [PATCH 1/6] fix: authZ checks for delete and update process
+
+(cherry picked from commit 49eca561927f4e46b053b0fe01e52c2e20dd4b50)
+---
+ .../dspace/scripts/ProcessServiceImpl.java    | 42 ++++++++--
+ .../scripts/service/ProcessService.java       | 17 +++-
+ .../repository/ProcessRestRepository.java     |  7 +-
+ .../impl/RestDSpaceRunnableHandler.java       |  6 +-
+ .../app/rest/ProcessRestRepositoryIT.java     | 79 +++++++++++++++++++
+ 5 files changed, 136 insertions(+), 15 deletions(-)
+
+diff --git a/dspace-api/src/main/java/org/dspace/scripts/ProcessServiceImpl.java b/dspace-api/src/main/java/org/dspace/scripts/ProcessServiceImpl.java
+index 5826a959f8b8..a36d9b0b6434 100644
+--- a/dspace-api/src/main/java/org/dspace/scripts/ProcessServiceImpl.java
++++ b/dspace-api/src/main/java/org/dspace/scripts/ProcessServiceImpl.java
+@@ -142,7 +142,7 @@ public List<Process> findByUser(Context context, EPerson eperson, int limit, int
+     }
+ 
+     @Override
+-    public void start(Context context, Process process) throws SQLException {
++    public void start(Context context, Process process) throws SQLException, AuthorizeException {
+         process.setProcessStatus(ProcessStatus.RUNNING);
+         process.setStartTime(Instant.now());
+         update(context, process);
+@@ -152,7 +152,7 @@ public void start(Context context, Process process) throws SQLException {
+     }
+ 
+     @Override
+-    public void fail(Context context, Process process) throws SQLException {
++    public void fail(Context context, Process process) throws SQLException, AuthorizeException {
+         process.setProcessStatus(ProcessStatus.FAILED);
+         process.setFinishedTime(Instant.now());
+         update(context, process);
+@@ -162,7 +162,7 @@ public void fail(Context context, Process process) throws SQLException {
+     }
+ 
+     @Override
+-    public void complete(Context context, Process process) throws SQLException {
++    public void complete(Context context, Process process) throws SQLException, AuthorizeException {
+         process.setProcessStatus(ProcessStatus.COMPLETED);
+         process.setFinishedTime(Instant.now());
+         update(context, process);
+@@ -174,6 +174,9 @@ public void complete(Context context, Process process) throws SQLException {
+     @Override
+     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
+         throws IOException, SQLException, AuthorizeException {
++        if (!authorizeActionBoolean(context, process)) {
++            throw new AuthorizeException("Cannot append file to process " + process.getID());
++        }
+         Bitstream bitstream = bitstreamService.create(context, is);
+         if (getBitstream(context, process, type) != null) {
+             throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
+@@ -194,7 +197,9 @@ public void appendFile(Context context, Process process, InputStream is, String
+ 
+     @Override
+     public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException {
+-
++        if (!authorizeActionBoolean(context, process)) {
++            throw new AuthorizeException("Cannot delete process " + process.getID());
++        }
+         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
+             bitstreamService.delete(context, bitstream);
+         }
+@@ -204,7 +209,10 @@ public void delete(Context context, Process process) throws SQLException, IOExce
+     }
+ 
+     @Override
+-    public void update(Context context, Process process) throws SQLException {
++    public void update(Context context, Process process) throws SQLException, AuthorizeException {
++        if (!authorizeActionBoolean(context, process)) {
++            throw new AuthorizeException("Cannot update process " + process.getID());
++        }
+         processDAO.save(context, process);
+     }
+ 
+@@ -331,6 +339,30 @@ public int countByUser(Context context, EPerson user) throws SQLException {
+         return processDAO.countByUser(context, user);
+     }
+ 
++    /**
++     * Authorize any action, to ensure only a process creator/owner or a repository administrator
++     * may read, update or delete an existing process.
++     * @param context DSpace context containing the current user
++     * @param process the process to check
++     * @return true if the current user may perform the action, or false
++     */
++    @Override
++    public boolean authorizeActionBoolean(Context context, Process process) {
++        try {
++            if (process == null) {
++                return false;
++            }
++            // Only the process owner or an administrator may perform any action
++            if ((null != context.getCurrentUser() && context.getCurrentUser().equals(process.getEPerson()) )
++                    || authorizeService.isAdmin(context)) {
++                return true;
++            }
++        } catch (SQLException e) {
++            log.error(e::getMessage, e);
++        }
++        return false;
++    }
++
+     @Override
+     public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
+         List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
+diff --git a/dspace-api/src/main/java/org/dspace/scripts/service/ProcessService.java b/dspace-api/src/main/java/org/dspace/scripts/service/ProcessService.java
+index 614cf58eb622..9e4ec564d9c9 100644
+--- a/dspace-api/src/main/java/org/dspace/scripts/service/ProcessService.java
++++ b/dspace-api/src/main/java/org/dspace/scripts/service/ProcessService.java
+@@ -97,7 +97,7 @@ public Process create(Context context, EPerson ePerson, String scriptName,
+      * @param process   The Process object to be updated
+      * @throws SQLException If something goes wrong
+      */
+-    public void start(Context context, Process process) throws SQLException;
++    public void start(Context context, Process process) throws SQLException, AuthorizeException;
+ 
+     /**
+      * This method will perform the logic needed to update the Process object in the database to represent
+@@ -106,7 +106,7 @@ public Process create(Context context, EPerson ePerson, String scriptName,
+      * @param process   The Process object to be updated
+      * @throws SQLException If something goes wrong
+      */
+-    public void fail(Context context, Process process) throws SQLException;
++    public void fail(Context context, Process process) throws SQLException, AuthorizeException;
+ 
+     /**
+      * This method will perform the logic needed to update the Process object in the database to represent
+@@ -115,7 +115,7 @@ public Process create(Context context, EPerson ePerson, String scriptName,
+      * @param process   The Process object to be updated
+      * @throws SQLException If something goes wrong
+      */
+-    public void complete(Context context, Process process) throws SQLException;
++    public void complete(Context context, Process process) throws SQLException, AuthorizeException;
+ 
+     /**
+      * The method will create a bitstream from the given inputstream with the given type as metadata and given name
+@@ -146,7 +146,7 @@ public void appendFile(Context context, Process process, InputStream is, String
+      * @param process   The Process object to be updated
+      * @throws SQLException If something goes wrong
+      */
+-    public void update(Context context, Process process) throws SQLException;
++    public void update(Context context, Process process) throws SQLException, AuthorizeException;
+ 
+     /**
+      * This method will retrieve the list of parameters from the Process in its String format and it will parse
+@@ -278,6 +278,15 @@ List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<Process
+      */
+     int countByUser(Context context, EPerson user) throws SQLException;
+ 
++    /**
++     * Authorize any action, to ensure only a process creator/owner or a repository administrator
++     * may read, update or delete an existing process.
++     * @param context DSpace context containing the current user
++     * @param process the process to check
++     * @return true if the current user may perform the action, or false
++     */
++    boolean authorizeActionBoolean(Context context, Process process);
++
+     /**
+      * Cleans up running processes by failing them an attaching their logs to the process objects.
+      *
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/repository/ProcessRestRepository.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/repository/ProcessRestRepository.java
+index 9942f55b82a5..107a0bdb6b48 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/repository/ProcessRestRepository.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/repository/ProcessRestRepository.java
+@@ -168,12 +168,13 @@ public BitstreamRest getProcessBitstreamByType(Integer processId, String type)
+     }
+ 
+     @Override
+-    protected void delete(Context context, Integer integer)
++    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'DELETE')")
++    protected void delete(Context context, Integer processId)
+         throws AuthorizeException, RepositoryMethodNotImplementedException {
+         try {
+-            processService.delete(context, processService.find(context, integer));
++            processService.delete(context, processService.find(context, processId));
+         } catch (SQLException | IOException e) {
+-            log.error("Something went wrong trying to find Process with id: " + integer, e);
++            log.error("Something went wrong trying to find Process with id: " + processId, e);
+             throw new RuntimeException(e.getMessage(), e);
+         }
+     }
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
+index ee67baa8ab38..1b2d378a1773 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
+@@ -94,7 +94,7 @@ public void start() {
+             processService.start(context, process);
+             context.complete();
+             logInfo("The script has started");
+-        } catch (SQLException e) {
++        } catch (SQLException | AuthorizeException e) {
+             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be started", e);
+         } finally {
+             if (context.isValid()) {
+@@ -281,8 +281,8 @@ public void schedule(DSpaceRunnable script) {
+             process.setProcessStatus(ProcessStatus.SCHEDULED);
+             processService.update(context, process);
+             context.complete();
+-        } catch (SQLException e) {
+-            log.error("RestDSpaceRunnableHandler with process: " + processId + " ran into an SQLException", e);
++        } catch (SQLException | AuthorizeException e) {
++            log.error("RestDSpaceRunnableHandler with process: " + processId + " ran into an exception", e);
+         } finally {
+             if (context.isValid()) {
+                 context.abort();
+diff --git a/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java b/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
+index 521b879647b0..e2dd6e2c9e8a 100644
+--- a/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
++++ b/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
+@@ -12,6 +12,7 @@
+ import static org.hamcrest.Matchers.contains;
+ import static org.hamcrest.Matchers.containsInAnyOrder;
+ import static org.hamcrest.Matchers.is;
++import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+@@ -56,6 +57,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
+ 
+     @Before
+     public void setup() throws SQLException {
++        context.setCurrentUser(admin);
+         CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
+             try {
+                 processService.delete(context, process);
+@@ -67,6 +69,7 @@ public void setup() throws SQLException {
+         parameters.add(new DSpaceCommandLineParameter("-i", null));
+ 
+         process = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
++        context.setCurrentUser(eperson);
+     }
+ 
+     @Test
+@@ -85,7 +88,9 @@ public void getProcessAdmin() throws Exception {
+     public void getProcessAdminEmptyParam() throws Exception {
+         String token = getAuthToken(admin.getEmail(), password);
+ 
++        context.setCurrentUser(admin);
+         Process process = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
++        context.setCurrentUser(eperson);
+ 
+         getClient(token).perform(get("/api/system/processes/" + process.getID()))
+                         .andExpect(status().isOk())
+@@ -155,9 +160,11 @@ public void getAllProcessesTestAdmin() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -212,9 +219,11 @@ public void getAllProcessesTestStartingUser() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(eperson.getEmail(), password);
+ 
+@@ -311,9 +320,11 @@ public void getProcessFilesTypes() throws Exception {
+ 
+     @Test
+     public void getProcessFilesTypesForbidden() throws Exception {
++        context.setCurrentUser(admin);
+         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+             processService.appendFile(context, process, is, "inputfile", "test.csv");
+         }
++        context.setCurrentUser(eperson);
+ 
+         List<String> fileTypesToCheck = new LinkedList<>();
+         fileTypesToCheck.add("inputfile");
+@@ -328,9 +339,11 @@ public void getProcessFilesTypesForbidden() throws Exception {
+ 
+     @Test
+     public void getProcessFilesTypesUnAuthorized() throws Exception {
++        context.setCurrentUser(admin);
+         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+             processService.appendFile(context, process, is, "inputfile", "test.csv");
+         }
++        context.setCurrentUser(eperson);
+ 
+         List<String> fileTypesToCheck = new LinkedList<>();
+         fileTypesToCheck.add("inputfile");
+@@ -342,9 +355,11 @@ public void getProcessFilesTypesUnAuthorized() throws Exception {
+ 
+     @Test
+     public void getProcessFilesTypesRandomProcessId() throws Exception {
++        context.setCurrentUser(admin);
+         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+             processService.appendFile(context, process, is, "inputfile", "test.csv");
+         }
++        context.setCurrentUser(eperson);
+ 
+         List<String> fileTypesToCheck = new LinkedList<>();
+         fileTypesToCheck.add("inputfile");
+@@ -381,9 +396,11 @@ public void searchProcessTestByUser() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -447,11 +464,13 @@ public void searchProcessTestByProcessStatus() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -479,11 +498,13 @@ public void searchProcessTestByScriptName() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -508,11 +529,13 @@ public void searchProcessTestByScriptNameAndUserId() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -542,11 +565,13 @@ public void searchProcessTestByUserIdAndProcessStatus() throws Exception {
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -577,10 +602,12 @@ public void searchProcessTestByUserIdAndProcessStatusAndScriptName() throws Exce
+         Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+         Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+         Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
++        context.setCurrentUser(admin);
+         Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+         Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                             .withProcessStatus(ProcessStatus.FAILED).build();
+         Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
++        context.setCurrentUser(eperson);
+ 
+         String token = getAuthToken(admin.getEmail(), password);
+ 
+@@ -897,8 +924,10 @@ public void testFindByCurrentUser() throws Exception {
+ 
+         Process process1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                          .withStartAndEndTime("1990-01-10", "1990-01-20").build();
++        context.setCurrentUser(admin);
+         ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                       .withStartAndEndTime("1990-01-11", "1990-01-19").build();
++        context.setCurrentUser(eperson);
+         Process process3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                          .withStartAndEndTime("1990-01-12", "1990-01-18").build();
+ 
+@@ -953,4 +982,54 @@ public void getProcessOutput() throws Exception {
+                                             is("script_output")));
+ 
+     }
++
++    @Test
++    public void deleteProcessByAdmin() throws Exception {
++        // Admin should be able to delete any process
++        Process processToDelete = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        int processId = processToDelete.getID();
++        String adminToken = getAuthToken(admin.getEmail(), password);
++        getClient(adminToken).perform(get("/api/system/processes/" + processId))
++                             .andExpect(status().isOk());
++        getClient(adminToken).perform(delete("/api/system/processes/" + processId))
++                             .andExpect(status().isNoContent());
++        getClient(adminToken).perform(get("/api/system/processes/" + processId))
++                             .andExpect(status().isNotFound());
++    }
++
++    @Test
++    public void deleteProcessByOwner() throws Exception {
++        // The user who started the process should be able to delete it
++        Process processToDelete = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
++        int processId = processToDelete.getID();
++        String ownerToken = getAuthToken(eperson.getEmail(), password);
++        getClient(ownerToken).perform(get("/api/system/processes/" + processId))
++                             .andExpect(status().isOk());
++        getClient(ownerToken).perform(delete("/api/system/processes/" + processId))
++                             .andExpect(status().isNoContent());
++        String adminToken = getAuthToken(admin.getEmail(), password);
++        getClient(adminToken).perform(get("/api/system/processes/" + processId))
++                             .andExpect(status().isNotFound());
++    }
++
++    @Test
++    public void deleteProcessByOtherUserForbidden() throws Exception {
++        // A user who did not start the process (and is not admin) should get 403
++        String epersonToken = getAuthToken(eperson.getEmail(), password);
++        getClient(epersonToken).perform(delete("/api/system/processes/" + process.getID()))
++                               .andExpect(status().isForbidden());
++        String adminToken = getAuthToken(admin.getEmail(), password);
++        getClient(adminToken).perform(get("/api/system/processes/" + process.getID()))
++                             .andExpect(status().isOk());
++    }
++
++    @Test
++    public void deleteProcessByAnonymousUnauthorized() throws Exception {
++        // Anonymous users should get 401
++        getClient().perform(delete("/api/system/processes/" + process.getID()))
++                   .andExpect(status().isUnauthorized());
++        String adminToken = getAuthToken(admin.getEmail(), password);
++        getClient(adminToken).perform(get("/api/system/processes/" + process.getID()))
++                             .andExpect(status().isOk());
++    }
+ }
+
+From 19ead72459c87c7fdbf09b19c89b802f565a2f19 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Fri, 24 Jul 2026 17:37:26 +0200
+Subject: [PATCH 2/6] fix: process authz eval plugin consistent with service
+
+(cherry picked from commit 5164879242dcf6b1f6aa5bee11b066d81ba26598)
+---
+ .../security/ProcessRestPermissionEvaluatorPlugin.java | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
+index b476b3fef98d..15104566f5d5 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
+@@ -54,17 +54,19 @@ public boolean hasDSpacePermission(Authentication authentication, Serializable t
+ 
+         Request request = requestService.getCurrentRequest();
+         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
++        if (context == null) {
++            return false;
++        }
+ 
+         try {
+             int processId = Integer.parseInt(targetId.toString());
+             Process process = processService.find(context, processId);
++            // TODO: Why true? Because this will throw a 404 later?
+             if (process == null) {
+                 return true;
+             }
+-            if (!((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson())
+-                && !authorizeService.isAdmin(context)))) {
+-                return true;
+-            }
++            // Only the process owner or an administrator may perform any action
++            return processService.authorizeActionBoolean(context, process);
+         } catch (SQLException e) {
+             log.error(e::getMessage, e);
+         }
+
+From d54a280d506e63efcb9f62b0713398efe8674798 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Tue, 11 Aug 2026 14:05:09 +0200
+Subject: [PATCH 3/6] fix: expect 403 for null process ID findByOne
+
+to avoid enumeration of sequential integers
+
+(cherry picked from commit bcdca281adf6dbcc09090a641c1e61acbf640807)
+---
+ .../test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java b/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
+index e2dd6e2c9e8a..984c6b963121 100644
+--- a/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
++++ b/dspace-server-webapp/src/test/java/org/dspace/app/rest/ProcessRestRepositoryIT.java
+@@ -138,7 +138,7 @@ public void getProcessNotExisting() throws Exception {
+         String token = getAuthToken(eperson.getEmail(), password);
+ 
+         getClient(token).perform(get("/api/system/processes/" + process.getID() * 23 + 17))
+-                        .andExpect(status().isNotFound());
++                        .andExpect(status().isForbidden());
+     }
+ 
+     @Test
+
+From f5fe46ce03d887e33481309db6d55caf6d793dc7 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Tue, 11 Aug 2026 14:23:10 +0200
+Subject: [PATCH 4/6] fix: return 403 for null process ID findByOne
+
+to avoid enumeration of sequential integers
+
+(cherry picked from commit f852a3f978be38b27dc91da6c7cb1b7947a463e9)
+---
+ .../rest/security/ProcessRestPermissionEvaluatorPlugin.java  | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
+index 15104566f5d5..541948ab163f 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/security/ProcessRestPermissionEvaluatorPlugin.java
+@@ -61,9 +61,10 @@ public boolean hasDSpacePermission(Authentication authentication, Serializable t
+         try {
+             int processId = Integer.parseInt(targetId.toString());
+             Process process = processService.find(context, processId);
+-            // TODO: Why true? Because this will throw a 404 later?
++            // This previously returned true, to allow a 404 to be thrown later. However, this assists enumeration
++            // of sequential process IDs. It is better to simply return 'unauthorized' here.
+             if (process == null) {
+-                return true;
++                return false;
+             }
+             // Only the process owner or an administrator may perform any action
+             return processService.authorizeActionBoolean(context, process);
+
+From 55521d689bdd0f546ebd58f6d2b93b0976f60b74 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Tue, 11 Aug 2026 14:23:39 +0200
+Subject: [PATCH 5/6] fix: set Context current user in
+ RestDSpaceRunnableHandler
+
+(cherry picked from commit 0bb0785b2bbeeb36577baa42af1650f9f6f35448)
+---
+ .../impl/RestDSpaceRunnableHandler.java       | 23 ++++++++++++++-----
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java b/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
+index 1b2d378a1773..b9160e23643d 100644
+--- a/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
++++ b/dspace-server-webapp/src/main/java/org/dspace/app/rest/scripts/handler/impl/RestDSpaceRunnableHandler.java
+@@ -30,8 +30,6 @@
+ import org.dspace.core.Context;
+ import org.dspace.eperson.EPerson;
+ import org.dspace.eperson.Group;
+-import org.dspace.eperson.factory.EPersonServiceFactory;
+-import org.dspace.eperson.service.EPersonService;
+ import org.dspace.scripts.DSpaceCommandLineParameter;
+ import org.dspace.scripts.DSpaceRunnable;
+ import org.dspace.scripts.Process;
+@@ -51,11 +49,10 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
+ 
+     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+ 
+     private Integer processId;
+     private String scriptName;
+-    private UUID ePersonId;
++    private EPerson ePerson;
+ 
+     /**
+      * This constructor will initialise the handler with the process created from the parameters
+@@ -69,7 +66,7 @@ public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpace
+                                      final Set<Group> specialGroups) {
+         Context context = new Context();
+         try {
+-            ePersonId = ePerson.getID();
++            this.ePerson = ePerson;
+             Process process = processService.create(context, ePerson, scriptName, parameters, specialGroups);
+             processId = process.getID();
+             this.scriptName = process.getName();
+@@ -89,6 +86,9 @@ public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpace
+     @Override
+     public void start() {
+         Context context = new Context();
++        if (null != ePerson) {
++            context.setCurrentUser(ePerson);
++        }
+         try {
+             Process process = processService.find(context, processId);
+             processService.start(context, process);
+@@ -106,6 +106,9 @@ public void start() {
+     @Override
+     public void handleCompletion() {
+         Context context = new Context();
++        if (null != ePerson) {
++            context.setCurrentUser(ePerson);
++        }
+         try {
+             Process process = processService.find(context, processId);
+             processService.complete(context, process);
+@@ -143,6 +146,9 @@ public void handleException(String message, Exception e) {
+         logError(message, e);
+ 
+         Context context = new Context();
++        if (null != ePerson) {
++            context.setCurrentUser(ePerson);
++        }
+         try {
+             Process process = processService.find(context, processId);
+             processService.fail(context, process);
+@@ -276,6 +282,9 @@ public void schedule(DSpaceRunnable script) {
+         TaskExecutor taskExecutor = new DSpace().getServiceManager()
+                                                 .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
+         Context context = new Context();
++        if (null != ePerson) {
++            context.setCurrentUser(ePerson);
++        }
+         try {
+             Process process = processService.find(context, processId);
+             process.setProcessStatus(ProcessStatus.SCHEDULED);
+@@ -301,7 +310,6 @@ private void appendLogToProcess(String message, ProcessLogLevel error) {
+ 
+     private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
+         try {
+-            EPerson ePerson = ePersonService.find(context, ePersonId);
+             Process process = processService.find(context, processId);
+ 
+             context.setCurrentUser(ePerson);
+@@ -314,6 +322,9 @@ private void addLogBitstreamToProcess(Context context) throws SQLException, IOEx
+     @Override
+     public List<UUID> getSpecialGroups() {
+         Context context = new Context();
++        if (ePerson != null) {
++            context.setCurrentUser(ePerson);
++        }
+         List<UUID> specialGroups = new ArrayList<>();
+         try {
+             Process process = processService.find(context, processId);
+
+From b818a143aa8b6f8d0c1862dfce1e100efbdd4772 Mon Sep 17 00:00:00 2001
+From: Kim Shepherd <kim@shepherd.nz>
+Date: Tue, 1 Sep 2026 14:16:29 +0200
+Subject: [PATCH 6/6] fix: set current user in ProcessCleanerIT tests
+
+(cherry picked from commit 71d59e3efe963114302d9b9b504662414574e5c6)
+---
+ .../dspace/administer/ProcessCleanerIT.java   | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/dspace-api/src/test/java/org/dspace/administer/ProcessCleanerIT.java b/dspace-api/src/test/java/org/dspace/administer/ProcessCleanerIT.java
+index 41bf451ed7ee..e1225fa51962 100644
+--- a/dspace-api/src/test/java/org/dspace/administer/ProcessCleanerIT.java
++++ b/dspace-api/src/test/java/org/dspace/administer/ProcessCleanerIT.java
+@@ -27,11 +27,14 @@
+ import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+ import org.dspace.builder.ProcessBuilder;
+ import org.dspace.content.ProcessStatus;
++import org.dspace.eperson.EPerson;
+ import org.dspace.scripts.Process;
+ import org.dspace.scripts.factory.ScriptServiceFactory;
+ import org.dspace.scripts.service.ProcessService;
+ import org.dspace.services.ConfigurationService;
+ import org.dspace.services.factory.DSpaceServicesFactory;
++import org.junit.After;
++import org.junit.Before;
+ import org.junit.Test;
+ 
+ /**
+@@ -46,6 +49,21 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
+ 
+     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+ 
++    private EPerson prevUser = null;
++
++    @Before
++    public void setUser() {
++        // buildProcess creates all processes with the 'admin' owner user so we should set that
++        // as the current context user in tests which expect to find created processes
++        prevUser = context.getCurrentUser();
++        context.setCurrentUser(admin);
++    }
++
++    @After
++    public void restoreUser() {
++       context.setCurrentUser(prevUser);
++    }
++
+     @Test
+     public void testWithoutProcessToDelete() throws Exception {
+ 
+@@ -69,10 +87,15 @@ public void testWithoutProcessToDelete() throws Exception {
+         assertThat(messages, hasItem("Found 0 processes to be deleted"));
+         assertThat(messages, hasItem("Process cleanup completed"));
+ 
++        EPerson prevUser = context.getCurrentUser();
++        context.setCurrentUser(admin);
++
+         assertThat(processService.find(context, process_1.getID()), notNullValue());
+         assertThat(processService.find(context, process_2.getID()), notNullValue());
+         assertThat(processService.find(context, process_3.getID()), notNullValue());
+ 
++        context.setCurrentUser(prevUser);
++
+     }
+ 
+     @Test
