@@ -192,12 +192,21 @@
         <property name="sidebarFacets">
             <list>
                 <ref bean="searchFilterAuthor" />
-                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterAuthorCorporate" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterType"/>
+                <ref bean="searchFilterAgrovoc" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterRegion" />
+                <ref bean="searchFilterProgramAccelerator"/>
+                <ref bean="searchFilterCountry" />
+                <ref bean="searchFilterInitiative" />
+                <ref bean="searchFilterImpactArea" />
+                <ref bean="searchFilterActionArea" />
+                <ref bean="searchFilterfunderName" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <!-- <ref bean="searchFilterHasGeospatialMetadata"/> -->
                 <ref bean="searchFilterEntityType"/>
-                <ref bean="searchFilterAccessStatus" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -207,14 +216,23 @@
             <list>
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
-                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterAuthorCorporate" />
+                <ref bean="searchFilterType" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterAgrovoc" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterRegion" />
+                <ref bean="searchFilterProgramAccelerator"/>
+                <ref bean="searchFilterCountry" />
+                <ref bean="searchFilterInitiative" />
+                <ref bean="searchFilterImpactArea" />
+                <ref bean="searchFilterActionArea" />
+                <ref bean="searchFilterfunderName" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
                 <ref bean="searchFilterHasGeospatialMetadata" />
                 <ref bean="searchFilterEntityType"/>
-                <ref bean="searchFilterAccessStatus" />
                 <ref bean="searchFilterIsAuthorOfPublicationRelation"/>
                 <ref bean="searchFilterIsProjectOfPublicationRelation"/>
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
@@ -2651,7 +2669,7 @@
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
-                <value>dc.subject.*</value>
+                <value>dc.subject.keywords</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3380,6 +3398,167 @@
         <property name="pageSize" value="10"/>
         <property name="exposeMinAndMaxValue" value="true"/>
     </bean>
+
+    <!--_________________-->
+    <!-- CIMMYT Filters -->
+
+
+    <bean id="searchFilterAuthorCorporate" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="authorcorporate"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.corporateauthor</value>
+                <value>dc.creator.corporate</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterAgrovoc" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="agrovoc"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.subject.agrovoc</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterRegion" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="region_item"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.region.*</value>
+                <value>dc.coverage.countryfocus</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+
+    <bean id="searchFilterCountry" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="country"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.country.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterIsPartOfSeries" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="region"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.ispartofseries</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+ <!-- CGIAR inititive -->
+    
+    <bean id="searchFilterProgramAccelerator" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ProgramOrAccelerator"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.programAccelerator</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterInitiative" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="initiative"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.CGIARinitiative</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterImpactArea" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="impactarea"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.impactArea</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterActionArea" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="actionarea"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.actionArea</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterfunderName" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="fundername"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.funderName</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+ <!-- CGIAR inititive --> 
+
+<!-- To CGSpace -->
+<!-- This filter is using to search items to send to CGSpace -->
+
+    <bean id="searchFilterToCGSpace" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ToCGSpace"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.cgspacestatus</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+<!-- To CGSpace -->
+
+
+
+
+
+
+
+
+
+
+    <!--_________________-->
+    <!-- CIMMYT Filters -->
 
     <!--Sort properties-->
     <bean id="sortScore" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
